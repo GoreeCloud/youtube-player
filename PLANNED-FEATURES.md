@@ -1,7 +1,10 @@
-# GoreeCloud YouTube Player — Feature Roadmap
+# GoreeCloud YouTube Player — Planned Features
+
+> **Authority:** Repository-native planned-feature record  
+> **Migration:** Replaces the retired `FEATURE-ROADMAP.md` / Google Drive roadmap controls. GitHub is the sole feature-state authority.
 
 **Lifecycle:** Active Development  
-**Roadmap authority:** synchronized repository counterpart to GoreeCloud Drive → Feature Roadmap → GoreeCloud YouTube Player → `FEATURE-ROADMAP.docx`  
+**Roadmap authority:** docx`  
 **Canonical product scope:** GoreeCloud Drive → Projects → `Project Specification — YouTube Player.docx`
 
 This roadmap orders work. It does not upgrade planned capabilities into implemented features.
