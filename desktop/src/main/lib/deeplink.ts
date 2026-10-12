@@ -2,13 +2,9 @@ import path from 'path'
 import { mainWindow } from './main-window'
 import { uiClient } from 'main/ipc/ui'
 import { app } from 'electron'
-import { isSupportedUrl } from '@/lib/supported-url'
+import { findSupportedLaunchUrl, isSupportedUrl } from '@/lib/supported-url'
 
 const pendingDeeplinks: string[] = []
-
-function findLaunchUrl(args: string[]): string | undefined {
-  return args.find(isSupportedUrl)
-}
 
 function handleLaunchUrl(url: string): void {
   // OS protocol callbacks are untrusted; reject before queuing or IPC.
@@ -39,7 +35,7 @@ export function bindDeeplink(): void {
     app.quit()
   }
 
-  const launchUrl = findLaunchUrl(process.argv)
+  const launchUrl = findSupportedLaunchUrl(process.argv)
   if (launchUrl) {
     pendingDeeplinks.push(launchUrl)
   }
@@ -51,7 +47,7 @@ export function bindDeeplink(): void {
       mainWindow.focus()
     }
 
-    const url = findLaunchUrl(commandLine)
+    const url = findSupportedLaunchUrl(commandLine)
     if (url) {
       handleLaunchUrl(url)
     }
