@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { isSupportedUrl, normalizeSupportedUrl } from '../../lib/supported-url.ts'
+import { isSupportedUrl, isSafeExternalUrl, normalizeSupportedUrl } from '../../lib/supported-url.ts'
 
 test('allows approved YouTube hosts with HTTPS or legacy links', () => {
   for (const input of [
@@ -35,4 +35,24 @@ test('rejects malformed, unrelated, or deceptive input', () => {
     normalizeSupportedUrl('https://example.com/?next=noutube://www.youtube.com'),
     'https://example.com/?next=noutube://www.youtube.com',
   )
+})
+
+test('only ordinary web links may be handed to the OS', () => {
+  for (const url of ['https://example.com/article', 'http://example.org:8080/path']) {
+    assert.equal(isSafeExternalUrl(url), true, url)
+  }
+  for (const url of [
+    '',
+    'file:///etc/passwd',
+    'javascript:alert(1)',
+    'data:text/html,hello',
+    'intent://scan/#Intent',
+    'mailto:someone@example.com',
+    'noutube://www.youtube.com/watch?v=abc',
+    'https://user:pass@example.com/',
+    'https://example.com/hello\nworld',
+    'not a URL',
+  ]) {
+    assert.equal(isSafeExternalUrl(url), false, url)
+  }
 })
