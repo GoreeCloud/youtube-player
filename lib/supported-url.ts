@@ -30,6 +30,11 @@ export function isSupportedUrl(value: string) {
   }
 }
 
+/** Find the first trusted shared link among arbitrary OS process arguments. */
+export function findSupportedLaunchUrl(args: readonly string[]): string | undefined {
+  return args.find(isSupportedUrl)
+}
+
 /** Only ordinary web destinations may leave the sandboxed player through the OS. */
 export function isSafeExternalUrl(value: string) {
   if (!value || /[\u0000-\u001f\u007f]/.test(value)) {
