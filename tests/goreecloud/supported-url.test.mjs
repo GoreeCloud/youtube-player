@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { isSupportedUrl, isSafeExternalUrl, normalizeSupportedUrl } from '../../lib/supported-url.ts'
+import { isSupportedUrl, isSafeExternalUrl, findSupportedLaunchUrl, normalizeSupportedUrl } from '../../lib/supported-url.ts'
 
 test('allows approved YouTube hosts with HTTPS or legacy links', () => {
   for (const input of [
@@ -55,4 +55,24 @@ test('only ordinary web links may be handed to the OS', () => {
   ]) {
     assert.equal(isSafeExternalUrl(url), false, url)
   }
+})
+
+
+test('OS argv selects the first validated YouTube link, never a legacy auth token', () => {
+  const malicious = [
+    '--profile=Default',
+    'noutube:auth?code=private',
+    'noutube://not-youtube.example/clip',
+    'file:///tmp/request.json',
+    'https://user:secret@www.youtube.com/watch?v=abc',
+  ]
+  assert.equal(findSupportedLaunchUrl(malicious), undefined)
+  assert.equal(
+    findSupportedLaunchUrl([...malicious, 'noutube://youtu.be/approved', 'https://www.youtube.com/watch?v=later']),
+    'noutube://youtu.be/approved',
+  )
+  assert.equal(
+    findSupportedLaunchUrl(['--launch', 'https://music.youtube.com/watch?v=first', 'noutube://youtu.be/second']),
+    'https://music.youtube.com/watch?v=first',
+  )
 })

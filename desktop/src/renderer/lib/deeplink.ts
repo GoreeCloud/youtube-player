@@ -3,11 +3,9 @@ import { isSupportedUrl } from '@/lib/supported-url'
 import '../../types'
 
 export function handleDeeplink(link: string): void {
-  const url = new URL(link)
-  if (url.protocol != 'noutube:' && !isSupportedUrl(link)) {
-    return
-  }
-  // console.log('on deeplink', link)
+  // Never parse or navigate unchecked OS/desktop IPC input. The same
+  // allowlist already governs clipboard and other shared destinations.
+  if (!isSupportedUrl(link)) return
   openSharedUrl(link)
 }
 
