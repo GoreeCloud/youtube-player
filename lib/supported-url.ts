@@ -32,7 +32,7 @@ export function isSupportedUrl(value: string) {
 
 /**
  * Resolve video IDs across regular watch pages, Shorts, live streams,
- * privacy-preserving embeds, and youtu.be shares without trusting a lookalike host.
+ * YouTube embed pages, and youtu.be shares without trusting a lookalike host.
  */
 export function getSupportedVideoId(value: string): string | undefined {
   if (!isSupportedUrl(value)) return undefined
