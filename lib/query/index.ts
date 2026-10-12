@@ -1,8 +1,6 @@
 import { UseQueryOptions } from '@tanstack/react-query'
 import { auth$ } from '@/states/auth'
 
-const HOST = 'https://a.inks.page'
-
 export interface NoutubeIosEntitlement {
   status: string
   productId?: string | null
@@ -41,38 +39,14 @@ function getErrorMessage(payload: any, fallback?: string) {
   return payload?.error?.json?.message || payload?.message || fallback || 'Request failed'
 }
 
+// Explicitly fail closed: the imported API belongs to the upstream account
+// and billing service. Never forward a GoreeCloud user's tokens or purchases.
 async function callNoutubeApi<T>(
-  path: string,
-  init?: RequestInit,
-  authorization = auth$.accessToken.get(),
+  _path: string,
+  _init?: RequestInit,
+  _authorization = auth$.accessToken.get(),
 ): Promise<T> {
-  const headers = new Headers(init?.headers)
-  if (authorization) {
-    headers.set('authorization', authorization)
-  }
-  const method = init?.method?.toUpperCase()
-  if ((init?.body || (method && method !== 'GET' && method !== 'HEAD')) && !headers.has('content-type')) {
-    headers.set('content-type', 'application/json')
-  }
-
-  const res = await fetch(`${HOST}/api/${path}`, {
-    ...init,
-    headers,
-  })
-
-  const rawText = await res.text()
-  const payload = (() => {
-    try {
-      return rawText ? JSON.parse(rawText) : null
-    } catch {
-      return null
-    }
-  })()
-  if (!res.ok || payload?.error) {
-    const fallback = rawText ? `HTTP ${res.status}: ${rawText.slice(0, 200)}` : `HTTP ${res.status}`
-    throw new Error(getErrorMessage(payload, fallback))
-  }
-  return payload?.result?.data as T
+  throw new Error('Legacy account, purchase and sync APIs are disabled in GoreeCloud YouTube Player.')
 }
 
 export const getMeQuery = (options?: Partial<UseQueryOptions<NoutubeEntitlement>>) => ({

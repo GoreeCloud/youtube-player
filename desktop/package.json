@@ -1,13 +1,12 @@
 {
-  "name": "noutube-desktop",
-  "productName": "NouTube",
-  "version": "0.3.1",
+  "name": "goreecloud-youtube-player-desktop",
+  "productName": "GoreeCloud YouTube Player",
+  "version": "0.1.0",
   "description": "YouTube and YouTube Music in a single app",
   "main": "./out/main/index.js",
-  "author": "Nonbili Inc.",
-  "homepage": "https://github.com/nonbili/NouTube",
+  "author": "GoreeCloud",
+  "homepage": "https://github.com/GoreeCloud/youtube-player",
   "scripts": {
-    "preinstall": "touch ../node_modules/noutube",
     "format": "prettier --write .",
     "lint": "eslint --cache .",
     "typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false -w",
@@ -45,7 +44,6 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
-    "noutube": "link:noutube",
     "react-hot-toast": "^2.5.2",
     "vite": "^7.0.6",
     "vite-plugin-react-native-web": "^2.2.1"

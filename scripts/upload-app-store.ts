@@ -16,7 +16,7 @@ import {
 const [ipaArg] = Bun.argv.slice(2)
 const pkg = await packageInfo()
 const ipaPath = ipaArg ?? process.env.IPA_PATH ?? resolve(repoRoot, 'ios/build/NouTube.ipa')
-const appIdentifier = process.env.IOS_APP_IDENTIFIER ?? 'jp.nonbili.noutube'
+const appIdentifier = process.env.IOS_APP_IDENTIFIER ?? 'com.goreecloud.youtubeplayer'
 const changelogSource = process.env.IOS_CHANGELOG_SOURCE
   ?? resolve(repoRoot, `metadata/en-US/changelogs/${pkg.versionCode}04.txt`)
 const releaseNotesPath = process.env.IOS_RELEASE_NOTES_PATH

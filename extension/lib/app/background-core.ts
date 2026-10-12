@@ -30,10 +30,9 @@ export const FEED_ALARM = 'noutube-feeds'
 let syncing = false
 let syncError: string | undefined
 
-const canSync = () => {
-  const { userId, plan } = auth$.get()
-  return Boolean(userId && plan && plan !== 'free')
-}
+// No upstream account sync in the GoreeCloud extension.
+const canSync = () => false
+
 
 const syncers = [bookmarksSyncer, foldersSyncer, settingsSyncer, userStylesSyncer]
 

@@ -30,3 +30,26 @@ Present in source is NOT verified runtime functionality or policy approval.
 ## Migration discipline
 
 Preserve imported behavior as a reference; replace one subsystem at a time, add reproducible tests, verify data migration and rollback, then retire old code. The Android library namespace and NouTube JavaScript bridge/API names remain unchanged initially to avoid breaking compatibility; application ID and UI display name are independent already.
+
+## Phase 2 — account-service isolation and build hygiene
+
+**Implemented in source (not release certified):**
+- Mobile account/sync settings now clearly state that GoreeCloud cloud sync is not connected. Existing local data stores are retained.
+- Legacy NouTube authentication token redemption, account API requests, purchase UI and on-start iOS purchase reconciliation are disabled; upstream Supabase URLs/keys have been removed from mobile and shared clients.
+- Browser-extension login and remote sync are disabled, upstream host/identity permissions removed, and the extension's locally available features remain wired.
+- Desktop automatic updates are disabled pending an independently verified signed GoreeCloud release channel; inherited publisher configuration, donation prompts and update links are removed or replaced.
+- Root/desktop/extension workspace identities and dependency lockfile have been aligned; inherited root package-link build errors removed.
+- Missing nativewind type declarations and legacy desktop package imports were corrected.
+
+**Local verification on October 12, 2026:**
+- Nine Python source/identity isolation tests passed.
+- Root Bun test suite: 332 passed / 0 failed.
+- TypeScript shared/mobile source, desktop Node and renderer, and extension (after WXT prepare) passed.
+- Bun locked dependency restoration completed using ignore-scripts.
+
+**Still pending (not claimed as complete):**
+- Build and install on Android/iOS physical devices, native feature parity and background media verification.
+- Official GoreeCloud Glaze implementation and approved visual assets, accessibility review and first-run onboarding refresh.
+- GoreeCloud Identity/Sync/Privacy Shield/Wardveil interfaces, encrypted data/credential migration and external security review.
+- Approved Development key management, signed APK in GoreeCloud Drive, release channel, licensed-source disclosures and actual deployment.
+- Desktop native package builds and browser extension signing/distribution.

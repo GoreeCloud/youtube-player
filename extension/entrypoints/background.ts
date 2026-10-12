@@ -37,7 +37,7 @@ export default defineBackground(() => {
   browser.runtime.onInstalled.addListener(() => {
     browser.contextMenus.create({
       id: ADD_VIDEO_BOOKMARK_MENU,
-      title: 'Save to NouTube',
+      title: 'Save to GoreeCloud YouTube Player',
       contexts: ['link'],
       documentUrlPatterns: YOUTUBE_MATCHES,
       targetUrlPatterns: SAVE_BOOKMARK_LINK_MATCHES,

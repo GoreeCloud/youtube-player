@@ -1,5 +1,5 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
-import 'noutube/content/types'
+import '../../../content/types'
 
 declare global {
   interface Window {

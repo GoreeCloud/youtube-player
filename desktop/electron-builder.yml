@@ -1,5 +1,5 @@
-appId: jp.nonbili.noutube
-productName: NouTube
+appId: com.goreecloud.youtubeplayer
+productName: GoreeCloud YouTube Player
 directories:
   buildResources: build
 files:
@@ -13,21 +13,17 @@ files:
 asarUnpack:
   - resources/**
 protocols:
-  - name: NouTube
+  - name: GoreeCloud YouTube Player
     schemes:
-      - noutube
+      - goreecloud-youtube-player
 win:
-  executableName: noutube
+  executableName: goreecloud-youtube-player
 nsis:
   artifactName: ${productName}-${version}-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
-appx:
-  artifactName: ${productName}-${version}.${ext}
-  identityName: NonbiliInc.NouTube
-  publisher: CN=E9477937-876C-417D-81DD-D63DDBACDEC2
-  publisherDisplayName: Nonbili
+# Windows publisher identity is intentionally not inherited; configure after signing approval.
 mac:
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:
@@ -36,20 +32,17 @@ mac:
 dmg:
   artifactName: ${productName}-${version}-${arch}.${ext}
 linux:
-  executableName: noutube
+  executableName: goreecloud-youtube-player
   executableArgs:
     - --ozone-platform=x11
   target:
     - AppImage
     - snap
-  maintainer: Nonbili Inc.
+  maintainer: GoreeCloud
   category: Utility
 appImage:
   artifactName: ${productName}-${version}.${ext}
 snap:
-  artifactName: noutube_${version}_${arch}.${ext}
+  artifactName: goreecloud-youtube-player_${version}_${arch}.${ext}
 npmRebuild: false
-publish:
-  provider: github
-  owner: nonbili
-  repo: NouTube-Desktop
+# No upstream release publisher; GoreeCloud release channel not configured.

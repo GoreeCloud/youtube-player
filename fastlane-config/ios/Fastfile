@@ -25,7 +25,7 @@ platform :ios do
   desc "Build and upload an IPA to App Store Connect"
   lane :upload_ipa do |options|
     api_key = asc_api_key
-    app_identifier = options[:app_identifier] || ENV["IOS_APP_IDENTIFIER"] || "jp.nonbili.noutube"
+    app_identifier = options[:app_identifier] || ENV["IOS_APP_IDENTIFIER"] || "com.goreecloud.youtubeplayer"
     ipa_path = options[:ipa] || ENV["IPA_PATH"] || File.expand_path("../../ios/build/NouTube.ipa", __dir__)
     build_before_upload = ENV["IOS_BUILD_BEFORE_UPLOAD"] == "1"
     skip_binary_upload = ENV["IOS_SKIP_BINARY_UPLOAD"] == "1"
