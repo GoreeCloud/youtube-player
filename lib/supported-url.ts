@@ -30,6 +30,24 @@ export function isSupportedUrl(value: string) {
   }
 }
 
+/** Only ordinary web destinations may leave the sandboxed player through the OS. */
+export function isSafeExternalUrl(value: string) {
+  if (!value || /[\u0000-\u001f\u007f]/.test(value)) {
+    return false
+  }
+  try {
+    const url = new URL(value)
+    return (
+      (url.protocol === 'http:' || url.protocol === 'https:') &&
+      Boolean(url.hostname) &&
+      !url.username &&
+      !url.password
+    )
+  } catch {
+    return false
+  }
+}
+
 /* youtu.be only redirects to the watch page. Nothing that decides where a link
  * belongs recognises it as a video until it has been spelled out. */
 export function expandShortUrl(value: string) {
