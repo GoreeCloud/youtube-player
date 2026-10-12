@@ -192,7 +192,7 @@ describe('mobile feed notifications', () => {
     expect(schedule).not.toHaveBeenCalled()
     expect(toasts$.get()).toHaveLength(1)
     expect(toasts$[0].message.get()).toBe('2 new videos from Channel')
-    toasts$[0].onPress.get()?.()
+    ;(toasts$[0].onPress.get() as (() => void) | undefined)?.()
     expect(ui$.feedModalOpen.get()).toBe(true)
     const behavior = await notificationHandler.handleNotification()
     expect(behavior.shouldShowBanner).toBe(false)

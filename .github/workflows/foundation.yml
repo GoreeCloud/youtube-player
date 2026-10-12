@@ -11,5 +11,48 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Validate source identity and provenance
-        run: python3 -m unittest discover -s tests/goreecloud -p 'test_*.py' -v
+      - name: Validate source identity and upstream isolation
+        run: python3 -B -m unittest discover -s tests/goreecloud -p 'test_*.py' -v
+  regressions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.3'
+      - name: Restore locked dependencies without running install hooks
+        run: bun install --frozen-lockfile --ignore-scripts
+      - name: Run local feature parity tests
+        run: bun test
+      - name: Typecheck shared/mobile source
+        run: bunx tsc --noEmit --pretty false
+      - name: Typecheck desktop main and renderer
+        run: |
+          bunx tsc -p desktop/tsconfig.node.json --noEmit --composite false --pretty false
+          bunx tsc -p desktop/tsconfig.web.json --noEmit --composite false --pretty false
+      - name: Generate browser extension declarations
+        working-directory: extension
+        run: bunx wxt prepare
+      - name: Typecheck browser extension
+        working-directory: extension
+        run: bunx tsc --noEmit --pretty false
+      - name: Bundle shared content scripts
+        run: bun run bundle:es
+      - name: Build unsigned desktop application sources
+        working-directory: desktop
+        run: bunx electron-vite build
+      - name: Build unsigned browser extension
+        working-directory: extension
+        run: bunx wxt build
+      - name: Verify extension has no upstream account permissions
+        run: |
+          python3 - <<'PYVERIFY'
+          import json
+          from pathlib import Path
+          p = Path('extension/.output/chrome-mv3/manifest.json')
+          manifest = json.loads(p.read_text())
+          assert manifest['name'] == 'GoreeCloud YouTube Player'
+          hosts = manifest.get('host_permissions', [])
+          assert not any('supabase' in h or 'inks.page' in h for h in hosts)
+          assert 'identity' not in manifest.get('permissions', [])
+          PYVERIFY

@@ -1,6 +1,6 @@
 import { mainClient } from '@/lib/main-client'
 
-const DESKTOP_RELEASES_FEED_URL = 'https://github.com/nonbili/NouTube-Desktop/releases.atom'
+const DESKTOP_RELEASES_FEED_URL = 'https://github.com/GoreeCloud/youtube-player/releases.atom'
 
 export async function fetchReleaseFeed() {
   const res = await mainClient.fetchFeed(DESKTOP_RELEASES_FEED_URL)

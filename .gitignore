@@ -37,6 +37,7 @@ assets/scripts/
 modules/*/android/build/
 
 *-env.d.ts
+!nativewind-env.d.ts
 
 desktop/out
 
@@ -49,3 +50,4 @@ fastlane/metadata/ios/en-US/release_notes.txt
 # Local Python validation caches
 __pycache__/
 *.pyc
+.goreecloud-local/

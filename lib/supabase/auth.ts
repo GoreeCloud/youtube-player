@@ -1,24 +1,15 @@
-import { openBrowser } from '@/lib/open-browser'
-import { fetchWebAuthLink } from '@/lib/query'
 import { supabase } from './client'
 
-const DELETE_ACCOUNT_URL = 'https://noutube.inks.page/auth/app/delete-account'
+const LEGACY_SERVICES_UNAVAILABLE = 'Account services are unavailable until GoreeCloud Identity and Sync are verified.'
 
+// Local sign-out cannot contact an inherited account provider.
 export const signOut = () => supabase.auth.signOut({ scope: 'local' })
 
-export const openDeleteAccount = async (accessToken: string) => {
-  const { token } = await fetchWebAuthLink(accessToken)
-  const url = token ? `${DELETE_ACCOUNT_URL}?t=${encodeURIComponent(token)}` : DELETE_ACCOUNT_URL
-  await openBrowser(url)
+export const openDeleteAccount = async (_accessToken: string): Promise<void> => {
+  throw new Error(LEGACY_SERVICES_UNAVAILABLE)
 }
 
-export const onReceiveAuthUrl = (url: string) => {
-  const token = new URL(url).searchParams.get('t')
-  if (token) {
-    // https://github.com/orgs/supabase/discussions/27181#discussioncomment-10986267
-    supabase.auth.verifyOtp({
-      token_hash: token,
-      type: 'email',
-    })
-  }
+// Do not redeem NouTube-authored deep-link tokens in GoreeCloud packages.
+export const onReceiveAuthUrl = (_url: string): void => {
+  return
 }

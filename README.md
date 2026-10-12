@@ -16,7 +16,7 @@ Inherited Android entrypoints are app.config.ts and android/app/build.gradle. Pr
 
     python3 -m unittest discover -s tests/goreecloud -p 'test_*.py'
 
-Android, iOS and desktop builds, on-device parity tests, privacy/security acceptance, development signing and Glaze conformance are **not yet verified**.
+Cloud sign-in, inherited billing and upstream sync are now disabled in this development baseline; device-local player, bookmarks, history and settings remain the preservation targets. Android, iOS and desktop native builds, on-device parity tests, privacy/security acceptance, development signing and Glaze conformance are **not yet verified**.
 
 See docs/fork-to-native.md for feature inventory, release blockers, and migration gates.
 

@@ -1,5 +1,4 @@
 import { syncState, type Observable } from '@legendapp/state'
-import { auth$ } from '@/states/auth'
 import { bookmarks$ } from '@/states/bookmarks'
 import { folders$ } from '@/states/folders'
 import { getSettingsSnapshot, settings$ } from '@/states/settings'
@@ -17,10 +16,9 @@ const logger = createLogger('sync', { devOnly: true })
 // defaults. That is not a local edit, so ignore changes until hydration lands.
 const isHydrated = (observable$: Observable<any>) => syncState(observable$).isPersistLoaded.get()
 
-const canSync = () => {
-  const { userId, plan } = auth$.get()
-  return Boolean(userId && plan && plan !== 'free')
-}
+// Re-enable only after a verified GoreeCloud Sync provider exists.
+const canSync = () => false
+
 
 export async function syncSupabase() {
   if (!canSync()) {

@@ -1,4 +1,4 @@
-app_identifier("jp.nonbili.noutube")
+app_identifier("com.goreecloud.youtubeplayer")
 apple_id("") # Your Apple ID
 itc_team_id("") # iTunes Connect Team ID
 team_id("") # Developer Portal Team ID

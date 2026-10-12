@@ -1,7 +1,4 @@
-set -e
-
-sed -i '' 's/jp.nonbili.noutube/jp.nonbili.noutube_dev/' app.config.ts
-sed -i '' 's/NouTube/NouTube-dev/' app.config.ts
-yes | bun expo prebuild -p android --clean --no-install
-sed -i '' 's/release {/release {\
-            signingConfig signingConfigs.debug/' android/app/build.gradle
+#!/bin/sh
+set -eu
+echo 'GoreeCloud YouTube Player uses its independent application ID.'
+echo 'Prepare a protected GoreeCloud Development signing identity before distributing an APK.'

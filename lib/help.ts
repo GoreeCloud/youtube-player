@@ -1,2 +1,2 @@
-export const FAQ_URL = 'https://oss.nonbili.jp/noutube/faq'
-export const SIGN_IN_FAQ_URL = `${FAQ_URL}#sign-in-problems`
+export const FAQ_URL = 'https://github.com/GoreeCloud/youtube-player/issues'
+export const SIGN_IN_FAQ_URL = FAQ_URL

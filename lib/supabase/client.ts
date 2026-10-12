@@ -1,7 +1,13 @@
 import { createClient } from '@supabase/supabase-js'
 
-export const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL || 'https://pgukcvgypvjwtibzlvhr.supabase.co',
-  import.meta.env.VITE_SUPABASE_ANON_KEY ||
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBndWtjdmd5cHZqd3RpYnpsdmhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTI0NTIzODQsImV4cCI6MjAyODAyODM4NH0.zoxse4Kay_svHlQOiAINZm1lPIFPJMZAY8RKZUDSQrs',
-)
+// Transition-only type-compatible client. Deliberately never targets an upstream
+// host, restores historical credentials, or refreshes sessions.
+// Replace only after GoreeCloud Identity/Sync contracts and tests are approved.
+export const supabase = createClient('https://goreecloud-sync-unconfigured.invalid', 'not-configured', {
+  auth: {
+    persistSession: false,
+    autoRefreshToken: false,
+    detectSessionInUrl: false,
+    storageKey: 'goreecloud-youtube-player-disabled-sync',
+  },
+})

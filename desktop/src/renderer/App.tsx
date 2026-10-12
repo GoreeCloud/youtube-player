@@ -1,5 +1,5 @@
-import contentJs from 'noutube/assets/scripts/main.bjs?raw'
-import { MainPage } from 'noutube/components/page/MainPage'
+import contentJs from '../../../assets/scripts/main.bjs?raw'
+import { MainPage } from '../../../components/page/MainPage'
 import { Toaster } from 'react-hot-toast'
 import { useObserveEffect } from '@legendapp/state/react'
 import { useEffect } from 'react'
