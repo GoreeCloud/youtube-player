@@ -1,0 +1,237 @@
+import { retry } from 'es-toolkit'
+import { iconAddQueue, iconDownload, iconStar } from './icons'
+import { emit, nouPolicy } from './utils'
+
+// Items on a playlist page link into the playlist, e.g.
+// watch?v=ID&list=WL&index=1&pp=..., and a bookmark made from that url would
+// reopen inside the playlist at that position instead of on its own.
+const stripPlaylistContext = (url: string) => {
+  try {
+    const parsed = new URL(url)
+    ;['list', 'index', 'start_radio', 'pp'].forEach((param) => parsed.searchParams.delete(param))
+    return parsed.href
+  } catch {
+    return url
+  }
+}
+
+const makeMenuItem = ({ icon, label }: { icon: string; label: string }) =>
+  nouPolicy.createHTML(/* HTML */ `
+    <button class="menu-item-button" style="display: flex; align-items: center; width: 100%; padding: 0 16px; min-height: 48px; background: none; border: none; font-family: inherit; font-size: 14px; text-align: left; cursor: pointer;">
+      <c3-icon fill-icon="false" style="margin-right: 16px; flex-shrink: 0; width: 24px; height: 24px;">
+        <span class="yt-icon-shape yt-spec-icon-shape" style="width: 24px; height: 24px; display: block;">
+          <div style="width: 24px; height: 24px; display: block; fill: currentcolor;">${icon}</div>
+        </span>
+      </c3-icon>
+      <span class="yt-core-attributed-string" role="text" style="flex: 1; font-size: 14px;">${label} 🦦</span>
+    </button>
+  `)
+
+const makePaperItem = ({ icon, label }: { icon: string; label: string }) =>
+  nouPolicy.createHTML(/* HTML */ `
+    <tp-yt-paper-item
+      class="style-scope ytd-menu-service-item-renderer"
+      role="option"
+      style="display: flex; align-items: center; width: 100%; padding: 0 16px; min-height: 40px; cursor: pointer;"
+    >
+      <yt-icon class="style-scope ytd-menu-service-item-renderer" style="margin-right: 16px; flex-shrink: 0; width: 24px; height: 24px;">
+        <span class="yt-icon-shape style-scope yt-icon ytSpecIconShapeHost" style="width: 24px; height: 24px; display: block;">
+          <div style="width: 24px; height: 24px; display: block; fill: currentcolor;">${icon}</div>
+        </span>
+      </yt-icon>
+      <yt-formatted-string class="style-scope ytd-menu-service-item-renderer" style="flex: 1; font-size: 14px;">${label} 🦦</yt-formatted-string>
+    </tp-yt-paper-item>
+  `)
+
+const updateClonedItem = (menuItem: HTMLElement, { icon, label }: { icon: string; label: string }) => {
+  menuItem.querySelectorAll('[id]').forEach((el) => el.removeAttribute('id'))
+
+  const nativeIcon = menuItem.querySelector<HTMLElement>(
+    '.ytListItemViewModelImage, .yt-list-item-view-model__image, c3-icon, yt-icon',
+  )
+  if (nativeIcon) {
+    const stableIcon = document.createElement('span')
+    stableIcon.className = nativeIcon.className
+    stableIcon.setAttribute('aria-hidden', 'true')
+    stableIcon.style.display = 'block'
+    stableIcon.style.width = '24px'
+    stableIcon.style.height = '24px'
+    stableIcon.style.flexShrink = '0'
+    if (menuItem.tagName.toLowerCase() === 'ytm-menu-item') {
+      stableIcon.style.marginRight = '16px'
+    }
+    stableIcon.innerHTML = nouPolicy.createHTML(/* HTML */ `
+      <span class="yt-icon-shape ytSpecIconShapeHost" style="width: 24px; height: 24px; display: block;">
+        <div style="width: 24px; height: 24px; display: block; fill: currentcolor;">${icon}</div>
+      </span>
+    `)
+    nativeIcon.replaceWith(stableIcon)
+  }
+
+  const text = menuItem.querySelector<HTMLElement>(
+    '.ytListItemViewModelTitle, .yt-list-item-view-model__title, .ytAttributedStringHost, .yt-core-attributed-string[role="text"], yt-formatted-string',
+  )
+  if (text) {
+    text.textContent = `${label} 🦦`
+    text.removeAttribute('is-empty')
+  }
+
+  return menuItem
+}
+
+const getNativeListItem = (menu: HTMLElement) =>
+  Array.from(menu.children).find(
+    (el) => el.tagName.toLowerCase() === 'yt-list-item-view-model' && !el.className.includes('_nou_'),
+  )
+
+const createMenuItem = (
+  menu: HTMLElement,
+  item: { icon: string; label: string },
+  itemCls: string,
+  listItemTemplate?: HTMLElement,
+) => {
+  let menuItem: HTMLElement
+
+  switch (menu.tagName.toLowerCase()) {
+    case 'yt-list-view-model': {
+      const nativeItem = listItemTemplate || getNativeListItem(menu)
+      if (!nativeItem) {
+        throw new Error('native list menu item is unavailable')
+      }
+      menuItem = updateClonedItem(nativeItem.cloneNode(true) as HTMLElement, item)
+      break
+    }
+    case 'tp-yt-paper-listbox':
+      menuItem = document.createElement('ytd-menu-service-item-renderer')
+      menuItem.innerHTML = makePaperItem(item)
+      break
+    default: {
+      const nativeItem = Array.from(menu.children).find(
+        (el) => el.tagName.toLowerCase() === 'ytm-menu-item' && !el.className.includes('_nou_'),
+      )
+      menuItem = nativeItem
+        ? updateClonedItem(nativeItem.cloneNode(true) as HTMLElement, item)
+        : document.createElement('ytm-menu-item')
+      if (!nativeItem) {
+        menuItem.innerHTML = makeMenuItem(item)
+      }
+    }
+  }
+
+  menuItem.classList.add(itemCls)
+  return menuItem
+}
+
+export function handleMenu() {
+  document.addEventListener('click', async (e) => {
+    const el = e.target as HTMLElement
+    const videoItem = el.closest(
+      'ytm-media-item,ytm-compact-video-renderer,ytm-video-card-renderer,ytm-playlist-video-renderer,yt-lockup-metadata-view-model,ytd-video-renderer,ytd-grid-video-renderer',
+    )
+    if (videoItem) {
+      const menuResult = await retry(
+        async () => {
+          const menus = document.querySelectorAll<HTMLElement>(
+            'ytm-menu-service-item-renderer,ytm-menu-navigation-item-renderer,yt-list-view-model,tp-yt-paper-listbox',
+          )
+          const readyMenu = Array.from(menus).find((candidate) => candidate.offsetHeight > 0)
+          if (readyMenu) {
+            if (readyMenu.tagName.toLowerCase() === 'yt-list-view-model') {
+              const nativeItem = getNativeListItem(readyMenu)
+              if (!nativeItem) {
+                throw 'menu items not ready'
+              }
+              return {
+                menu: readyMenu,
+                listItemTemplate: nativeItem.cloneNode(true) as HTMLElement,
+              }
+            }
+            return { menu: readyMenu }
+          }
+          throw 'menu not ready'
+        },
+        { retries: 50, delay: 100 },
+      )
+      const { menu, listItemTemplate } = menuResult
+      const title =
+        videoItem.querySelector('h3')?.textContent?.trim() || videoItem.querySelector('h4')?.textContent?.trim()
+      const href = videoItem.querySelector('a')?.href
+      const url = href ? stripPlaylistContext(href) : href
+      let menuItem: HTMLElement
+
+      if (window.NouTubeI) {
+        const queueCls = '_nou_queue_'
+        menu.querySelectorAll(`.${queueCls}`).forEach((el) => el.remove())
+        menuItem = createMenuItem(
+          menu,
+          { icon: iconAddQueue, label: 'Add to queue' },
+          queueCls,
+          listItemTemplate,
+        )
+        menuItem.onclick = () => {
+          if (url) {
+            emit('add-queue', { title, url })
+          }
+          menuItem.remove()
+        }
+        menu.prepend(menuItem)
+      }
+
+      const itemCls = '_nou_menu_'
+      menu.querySelectorAll(`.${itemCls}`).forEach((el) => el.remove())
+      const item = { icon: iconStar, label: 'Star' }
+      menuItem = createMenuItem(menu, item, itemCls, listItemTemplate)
+      menuItem.onclick = () => {
+        if (url) {
+          emit('star', { title, url })
+        }
+      }
+      menu.prepend(menuItem)
+
+      if (window.NouTubeDownloads !== false) {
+        const downloadCls = '_nou_download_'
+        menu.querySelectorAll(`.${downloadCls}`).forEach((el) => el.remove())
+        const downloadItemData = { icon: iconDownload, label: 'Download' }
+        const downloadMenuItem = createMenuItem(menu, downloadItemData, downloadCls, listItemTemplate)
+        downloadMenuItem.onclick = () => {
+          if (url) emit('download', { url })
+        }
+        menu.prepend(downloadMenuItem)
+
+        if (menu.tagName.toLowerCase() == 'tp-yt-paper-listbox') {
+          const label = downloadMenuItem.querySelector('yt-formatted-string')
+          if (label?.hasAttribute('is-empty')) {
+            label.textContent = downloadItemData.label + ' 🦦'
+            label.removeAttribute('is-empty')
+          }
+          const icon = downloadMenuItem.querySelector('yt-icon')
+          if (icon?.hasAttribute('hidden')) {
+            icon.innerHTML = nouPolicy.createHTML(/* HTML */ `
+              <span class="yt-icon-shape style-scope yt-icon ytSpecIconShapeHost">
+                <div style="width: 100%; height: 100%; display: block; fill: currentcolor;">${downloadItemData.icon}</div>
+              </span>
+            `)
+            icon.removeAttribute('hidden')
+          }
+        }
+      }
+
+      if (menu.tagName.toLowerCase() == 'tp-yt-paper-listbox') {
+        const label = menuItem.querySelector('yt-formatted-string')
+        if (label?.hasAttribute('is-empty')) {
+          label.textContent = item.label + ' 🦦'
+          label.removeAttribute('is-empty')
+        }
+        const icon = menuItem.querySelector('yt-icon')
+        if (icon?.hasAttribute('hidden')) {
+          icon.innerHTML = nouPolicy.createHTML(/* HTML */ `
+            <span class="yt-icon-shape style-scope yt-icon ytSpecIconShapeHost">
+              <div style="width: 100%; height: 100%; display: block; fill: currentcolor;">${item.icon}</div>
+            </span>
+          `)
+          icon.removeAttribute('hidden')
+        }
+      }
+    }
+  })
+}

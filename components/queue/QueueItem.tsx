@@ -1,0 +1,85 @@
+import { View, Pressable } from 'react-native'
+import MaterialIcons from '@react-native-vector-icons/material-icons'
+import { Bookmark } from '@/states/bookmarks'
+import { updateUrl } from '@/states/ui'
+import { colors } from '@/lib/colors'
+import { NouText } from '../NouText'
+import { nIf, isWeb, isIos } from '@/lib/utils'
+import { getThumbnail } from '@/lib/page'
+import { queue$ } from '@/states/queue'
+import { NouMenu } from '../menu/NouMenu'
+import { MaterialButton } from '../button/IconButtons'
+
+import { t } from 'i18next'
+import { share } from '@/lib/share'
+import { RetryImage } from '../image/RetryImage'
+import { useTwColor } from '@/lib/theme'
+
+const blurhash =
+  '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj['
+
+export const QueueItem: React.FC<{ bookmark: Bookmark; playing: boolean; index: number; total: number }> = ({
+  bookmark,
+  playing,
+  index,
+  total,
+}) => {
+  const tw = useTwColor()
+  const onPress = () => {
+    updateUrl(bookmark.url)
+  }
+
+  return (
+    <View className="flex-row my-2 overflow-hidden">
+      <View className="flex-row items-center">
+        <View className="w-6">{nIf(playing, <MaterialIcons name="play-arrow" color={tw(colors.icon)} size={16} />)}</View>
+        <Pressable className="w-[120px]" onPress={onPress}>
+          <RetryImage
+            source={bookmark.thumbnail || getThumbnail(bookmark.url)}
+            contentFit="cover"
+            placeholder={{ blurhash }}
+            style={{ height: 67.5, borderRadius: 8 }}
+          />
+        </Pressable>
+      </View>
+      <Pressable className="flex-1 ml-3" onPress={onPress}>
+        <NouText className="leading-6" numberOfLines={3} ellipsizeMode="tail">
+          {bookmark.title}
+        </NouText>
+      </Pressable>
+      <View className="flex-col justify-center">
+        <MaterialButton
+          name="keyboard-arrow-up"
+          size={20}
+          style={{ height: 30, width: 30 }}
+          onPress={() => queue$.moveUp(index)}
+          disabled={index === 0}
+          color={index === 0 ? tw(colors.iconSubtle) : undefined}
+        />
+        <MaterialButton
+          name="keyboard-arrow-down"
+          size={20}
+          style={{ height: 30, width: 30 }}
+          onPress={() => queue$.moveDown(index)}
+          disabled={index === total - 1}
+          color={index === total - 1 ? tw(colors.iconSubtle) : undefined}
+        />
+      </View>
+      <NouMenu
+        trigger={
+          isWeb ? (
+            <MaterialButton name="more-vert" size={20} />
+          ) : isIos ? (
+            'ellipsis'
+          ) : (
+            'filled.MoreVert'
+          )
+        }
+        items={[
+          { label: t('menus.share'), handler: () => share(bookmark.url) },
+          { label: t('menus.remove'), handler: () => queue$.toggleBookmark(bookmark) },
+        ]}
+      />
+    </View>
+  )
+}

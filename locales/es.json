@@ -1,0 +1,457 @@
+{
+  "about": {
+    "label": "Acerca de",
+    "code": "Código fuente",
+    "donate": "Donar",
+    "hint": "Información de versión, actualizaciones, código fuente y enlaces de soporte.",
+    "updates": "Actualizaciones"
+  },
+  "changelog": {
+    "label": "Registro de cambios",
+    "hint": "Lanzamientos recientes y correcciones de GitHub.",
+    "loading": "Cargando notas de la versión...",
+    "error": "Error al cargar las notas de la versión.",
+    "retry": "Reintentar",
+    "empty": "No se encontraron notas de la versión.",
+    "current": "Actual",
+    "noNotes": "No se proporcionaron notas de la versión para esta versión."
+  },
+  "buttons": {
+    "clear": "Limpiar",
+    "clearAll": "Limpiar todo",
+    "import": "Importar",
+    "export": "Exportar",
+    "open": "Abrir",
+    "cancel": "Cancelar",
+    "openUrl": "Abrir URL",
+    "move": "Mover",
+    "save": "Guardar",
+    "remove": "Remover",
+    "unsubscribe": "Anular suscripción",
+    "signOut": "Cerrar sesión",
+    "next": "Siguiente",
+    "show": "Mostrar",
+    "download": "Descargar",
+    "browse": "Explorar",
+    "updateYtDlp": "Actualizar yt-dlp",
+    "updating": "Actualizando...",
+    "ytDlpUpdated": "yt-dlp está actualizado",
+    "undo": "Deshacer",
+    "retry": "Reintentar"
+  },
+  "library": {
+    "videos": "Vídeos",
+    "channels": "Canales",
+    "playlists": "Listas de reproducción",
+    "songs": "Canciones",
+    "artists": "Artistas"
+  },
+  "menus": {
+    "edit": "Editar",
+    "remove": "Remover",
+    "unsubscribe": "Anular suscripción",
+    "reload": "Recargar",
+    "share": "Compartir",
+    "tools": "Herramientas",
+    "desktop": "Sitio de escritorio",
+    "on": "Activar",
+    "off": "Desactivar",
+    "pip": "Imagen en imagen",
+    "openInNewTab": "Abrir en una nueva pestaña",
+    "duplicateTab": "Duplicar pestaña",
+    "close": "Cerrar",
+    "moveTo": "Mover a…",
+    "download": "Descargar",
+    "star": "Destacar",
+    "unstar": "Quitar de destacados"
+  },
+  "modals": {
+    "editBookmark": "Editar marcador",
+    "title": "Título",
+    "folder": "Carpeta",
+    "ungrouped": "Desagrupado",
+    "feeds": "Feeds",
+    "history": "Historial",
+    "queue": "Cola",
+    "downloadVideo": "Descargar vídeo",
+    "downloadsFolder": "Carpeta de descargas",
+    "activeDownloads": "Descargas activas",
+    "downloadHistory": "Historial de descargas",
+    "starting": "Iniciando...",
+    "downloadComplete": "Descarga completada",
+    "downloadFailed": "Descarga fallida",
+    "failedToLoadFormats": "Error al cargar los formatos",
+    "playbackSpeed": "Velocidad de reproducción",
+    "playbackQuality": "Calidad de reproducción",
+    "sharePageUrl": "URL de la página",
+    "shareVideoUrl": "URL del video",
+    "shareIncludePosition": "Incluir posición actual",
+    "downloadUseCookies": "Usar mis cookies",
+    "downloadUseCookiesHint": "Necesario para videos privados, con restricción de edad o exclusivos para miembros. Puede cerrar tú sesión en YouTube, y usar una cuenta de esta forma conlleva el riesgo de que sea suspendida o marcada.",
+    "noFolder": "Sin carpeta",
+    "downloadErrorBlocked": "YouTube rechazó esta descarga. Requiere un token que yt-dlp aún no puede generar, por lo que este video no se puede descargar por ahora — la mayoría de los demás videos aún funcionan.",
+    "downloadErrorSignIn": "YouTube requiere una sesión iniciada para este vídeo. Activa «Usar mis cookies» e inténtalo de nuevo.",
+    "downloadErrorFormat": "Ese formato ya no está disponible. Vuelve a cargar los formatos y elige otro.",
+    "downloadErrorUnavailable": "Este video no está disponible.",
+    "downloadErrorNetwork": "No se pudo conectar con YouTube. Revisa tú conexión e inténtalo de nuevo.",
+    "showAllFormats": "Mostrar todos los formatos",
+    "showFewerFormats": "Mostrar menos formatos",
+    "pinnedFormat": "Fijado",
+    "pinFormat": "Fijar como formato predeterminado",
+    "unpinFormat": "Desfijar formato predeterminado"
+  },
+  "sleepTimer": {
+    "label": "Temporizador de apagado",
+    "hint": "Pausar la reproducción tras un tiempo predeterminado o un valor de minutos personalizado.",
+    "activeHint": "La reproducción se detendrá cuando termine esta cuenta regresiva.",
+    "off": "Desactivar",
+    "endsIn": "Finaliza en {{value}}",
+    "preset": "{{value}} minutos",
+    "customPlaceholder": "Minutos personalizados",
+    "set": "Configurar temporizador",
+    "cancel": "Cancelar temporizador",
+    "replace": "Reemplazar",
+    "validation": {
+      "minutes": "Introduce un número entero de minutos del 1 al 1440"
+    },
+    "setToast": "Temporizador de apagado configurado para {{value}} minutos",
+    "cancelToast": "Temporizador de apagado cancelado",
+    "expiredToast": "El temporizador de apagado ha finalizado"
+  },
+  "feeds": {
+    "updates": "Actualizaciones",
+    "manage": "Gestionar",
+    "sortLastVideo": "Último vídeo",
+    "sortFrequency": "Frecuencia",
+    "lastVideoNewest": "Último video: el más reciente primero",
+    "lastVideoOldest": "Último video: el más antiguo primero",
+    "frequencyHighest": "Frecuencia: la más alta primero",
+    "frequencyLowest": "Frecuencia: la más baja primero",
+    "frequencyLabel": "Frecuencia",
+    "lastVideoLabel": "Último vídeo",
+    "videosPerDay": "{{value}} vídeos/día",
+    "never": "Nunca",
+    "allFolders": "Todo",
+    "newFolder": "+ Nueva carpeta",
+    "editFeed": "Editar feed",
+    "manageEmpty": "Aún no hay feeds guardados.",
+    "manageNoResults": "No hay feeds que coincidan con los filtros actuales.",
+    "updatesEmpty": "Ningún vídeo del feed coincide con el filtro de la carpeta actual.",
+    "filterDropdownPlaceholder": "Filtrar carpetas y canales",
+    "filterDropdownEmpty": "No hay carpetas ni canales que coincidan.",
+    "emptyTitleNoChannels": "Canales destacados vacíos",
+    "emptyBodyNoChannels": "Las actualizaciones de los canales de YouTube destacados aparecerán aquí.",
+    "emptyTitleFolder": "No hay actualizaciones en {{folder}}",
+    "emptyTitleChannel": "No hay actualizaciones de {{channel}}",
+    "emptyBodyFiltered": "No hay vídeos recientes por aquí en este momento. Vuelve más tarde o cambia a \"Todo\".",
+    "emptyActionFetchNow": "Actualizar ahora",
+    "fetchToastSuccess": "Feed actualizado",
+    "fetchToastRunning": "Actualización en curso",
+    "fetchToastNotFound": "No se pudo actualizar este canal. El feed devolvió un error 404.",
+    "fetchToastError": "No se pudo actualizar este canal",
+    "emptyActionAllFolders": "Mostrar todo",
+    "emptyTitleWaiting": "Esperando actualizaciones del feed",
+    "emptyBodyWaiting": "Tus canales guardados están listos. Mantén la aplicación abierta un momento o vuelve a abrirla más tarde, y las subidas recientes aparecerán aquí.",
+    "removeTitle": "¿Eliminar {{title}}?",
+    "removeMessage": "Esto eliminará el canal de la biblioteca y limpiará sus videos del feed."
+  },
+  "settings": {
+    "hubHint": "Herramientas de reproducción, sincronización, importación y vista web en un solo lugar.",
+    "general": "General",
+    "generalHint": "Ajustes de reproducción, apariencia, herramientas y transferencia de datos.",
+    "preferences": "Preferencias",
+    "preferencesHint": "Comportamiento de reproducción, feed e historial.",
+    "appearance": "Apariencia",
+    "appearanceHint": "Barra de herramientas, idioma y tema.",
+    "tools": "Herramientas",
+    "toolsHint": "Administra el entorno de vista web y otras herramientas.",
+    "transfer": "Importar y exportar",
+    "transferHint": "Importa tus marcadores o llévatelos contigo.",
+    "label": "Ajustes",
+    "syncHintShort": "Cuenta, plan y sincronización de dispositivos.",
+    "restoreOnStart": "Restaurar la última sesión al iniciar",
+    "autoHideHeader": "Ocultar y mostrar la barra de herramientas según la dirección del desplazamiento",
+    "hideToolbarWhenScrolled": "Ocultar la barra de herramientas cuando la página no esté arriba",
+    "hideShorts": "Ocultar shorts en la línea de tiempo",
+    "hideShortsInNavbar": "Ocultar shorts en la barra de navegación",
+    "hideMixPlaylist": "Ocultar listas de reproducción Mix",
+    "miniPlayer": "Minirreproductor",
+    "preferH264": "Preferir H.264 (bloquear VP9/AV1)",
+    "clickbaitThumbnail": {
+      "label": "Evitar miniaturas clickbait",
+      "hint": "Reemplazar las miniaturas del creador con fotogramas de vídeo autogenerados",
+      "optionDefault": "Predeterminado",
+      "optionFrame": "Fotograma {{n}}"
+    },
+    "userStyles": {
+      "label": "Estilos y scripts de usuario",
+      "hint": "Tus propios estilos CSS y scripts de usuario específicos del sitio.",
+      "builtin": {
+        "label": "Estilos integrados",
+        "hideShortsInNavbar": {
+          "label": "Ocultar shorts de la barra de navegación"
+        },
+        "hideMixPlaylist": {
+          "label": "Ocultar listas de reproducción Mix"
+        },
+        "hideCommunityPosts": {
+          "label": "Ocultar publicaciones de la comunidad"
+        },
+        "hideAskButton": {
+          "label": "Ocultar el botón \"Preguntar a Gemini\""
+        },
+        "hideHomeFeed": {
+          "label": "Ocultar feed de inicio"
+        },
+        "hideRelatedVideos": {
+          "label": "Ocultar vídeos relacionados"
+        },
+        "hideEndScreens": {
+          "label": "Ocultar pantallas finales"
+        }
+      },
+      "custom": {
+        "label": "Estilos personalizados",
+        "empty": "Sin estilos personalizados aún."
+      },
+      "add": "Añadir estilo",
+      "addTitle": "Añadir estilo de usuario",
+      "editTitle": "Editar estilo de usuario",
+      "nameLabel": "Nombre",
+      "namePlaceholder": "Mi estilo",
+      "validation": {
+        "css": "El CSS no puede estar vacío"
+      },
+      "deleteConfirm": "¿Eliminar este estilo personalizado?",
+      "copyCss": "Copiar CSS",
+      "cssCopied": "CSS copiado",
+      "copyFailed": "Error al copiar el CSS",
+      "importFailed": "Error al importar el CSS",
+      "scripts": {
+        "label": "Scripts personalizados",
+        "empty": "Aún no hay scripts personalizados.",
+        "add": "Añadir script",
+        "addTitle": "Añadir script de usuario",
+        "editTitle": "Editar script de usuario",
+        "namePlaceholder": "Mi script",
+        "run": "Ejecutar",
+        "runComplete": "Script ejecutado",
+        "runFailed": "El script falló",
+        "import": "Importar",
+        "importFailed": "Error al importar el script",
+        "deleteConfirm": "¿Eliminar este script personalizado?",
+        "noActiveTab": "No hay ninguna vista web activa",
+        "validation": {
+          "js": "El código JavaScript no puede estar vacío"
+        },
+        "pinToHeader": "Fijar en la barra de herramientas",
+        "pinToHeaderHint": "­Mostrar este script como una acción de la barra de herramientas.",
+        "pinnedToHeader": "Fijado en la barra de herramientas",
+        "runAtStart": "Ejecutar al inicio del documento",
+        "runAtStartHint": "Ejecutar antes de que se construya el DOM, en lugar de después de DOMContentLoaded.",
+        "runAtStartDesktopHint": "Aún no está disponible en escritorio; los scripts se ejecutan una vez que el DOM está listo.",
+        "runAtStartBadge": "Se ejecuta al inicio del documento"
+      },
+      "builtinScripts": {
+        "label": "Scripts integrados",
+        "fixEncodedAuthorNames": {
+          "label": "Corregir carácteres especiales en los nombres de los autores"
+        }
+      }
+    },
+    "channelsFeed": "Feed de canales",
+    "watchHistory": "Historial de reproducciones",
+    "theme": {
+      "label": "Tema",
+      "system": "Sistema",
+      "dark": "Oscuro",
+      "light": "Claro",
+      "hint": "Se aplica a la aplicación y a YouTube. Reinicia manualmente sí el cambio no se refleja en la vista web."
+    },
+    "language": {
+      "label": "Lenguaje",
+      "system": "Sistema",
+      "hint": "Elegir un idioma o seguir el idioma del sistema."
+    },
+    "login": {
+      "label": "Prueba esto si no pudiste iniciar sesión desde la vista web",
+      "button": "Iniciar sesión en YouTube"
+    },
+    "openUrlLabel": "Abrir URL compatible directamente",
+    "webview": {
+      "clearLabel": "Borrar datos de la vista web"
+    },
+    "userAgent": {
+      "title": "User-Agent personalizado",
+      "default": "User-Agent predeterminado"
+    },
+    "importList": "Importar una lista de enlaces",
+    "importTakeout": "Importar desde YouTube Takeout",
+    "exportLabel": "Exportar marcadores a un archivo CSV",
+    "injectCookie": "Inyectar cookie si no pudiste iniciar sesión desde la vista web",
+    "injectCookieTitle": "Inyectar cookie de autenticación en la vista web",
+    "injectCookieHint": "Copiar el valor del encabezado Cookie del navegador de tu PC. Esta es una solución alternativa cuando no pudiste iniciar sesión con email/contraseña.",
+    "headerPosition": {
+      "label": "Posición de la barra de herramientas",
+      "top": "Arriba",
+      "bottom": "Abajo"
+    },
+    "showHomeButtonInHeader": "Mostrar botón de Inicio en la barra de herramientas",
+    "showBackButtonInHeader": "Mostrar botón de Atrás en la barra de herramientas",
+    "showForwardButtonInHeader": "Mostrar botón de Adelante en la barra de herramientas",
+    "blocklist": {
+      "label": "Lista de bloqueados",
+      "hint": "Ocultar vídeos de YouTube por canal o palabra clave en el título.",
+      "channels": "Canales",
+      "keywords": "Palabras clave",
+      "channelPlaceholder": "Nombre del canal, identificador o URL",
+      "keywordPlaceholder": "Palabra clave en el título",
+      "emptyChannels": "Aún no hay canales bloqueados.",
+      "emptyKeywords": "Aún no hay palabras clave bloqueadas.",
+      "add": "Añadir",
+      "channelsNote": "Los canales coinciden exactamente por nombre, identificador o ID del canal.",
+      "keywordsNote": "Las palabras clave coinciden por inclusión (búsqueda de subcadena en títulos)."
+    },
+    "autoHideSidebar": "Ocultar automáticamente la barra lateral y mostrar al pasar el cursor",
+    "showDislikes": "Mostrar \"No me gusta\"",
+    "showOriginalVideoTitle": "Mostrar título original del video",
+    "preferencesContent": "Contenido",
+    "preferencesPlayback": "Reproducción y pantalla",
+    "preferencesGeneral": "General",
+    "pullToRefresh": "Deslizar para actualizar",
+    "showReloadButtonInHeader": "Mostrar botón de recargar en la barra de herramientas",
+    "zoom": {
+      "label": "Zoom de texto",
+      "defaultLabel": "Zoom de texto",
+      "defaultHint": "Ajustar el tamaño del texto de las páginas web de YouTube."
+    },
+    "proxy": {
+      "label": "Proxy",
+      "enabled": "Habilitar proxy",
+      "type": "Tipo de proxy",
+      "host": "Servidor proxy",
+      "port": "Puerto proxy",
+      "hostPlaceholder": "e.j., 127.0.0.1 o proxy.ejemplo.com",
+      "portPlaceholder": "e.j., 1080"
+    },
+    "toolbar": "Barra de herramientas",
+    "toolbarButtons": "Botones de la barra de herramientas",
+    "showHistoryButtonInHeader": "Mostrar botón de historial en la barra de herramientas",
+    "doubleTapToToggleHeader": "Presione dos veces la página para ocultar/mostrar la barra de herramientas",
+    "translation": {
+      "enable": "Traducir comentarios",
+      "hint": "Mostrar un botón de traducción en los comentarios para traducirlos en su dispositivo.",
+      "targetLanguage": "Traducir a",
+      "appLanguage": "App",
+      "systemLanguage": "Sistema",
+      "notSelected": "Elegir un idioma",
+      "chooseLanguage": "Elija primero un idioma de traducción",
+      "loading": "Traduciendo…",
+      "copy": "Copiar traducción",
+      "copySource": "Copiar origen",
+      "pin": "Fijar traducción",
+      "unpin": "Desfijar traducción",
+      "failed": "No se pudo traducir este texto",
+      "unsupported": "Este par de idiomas no está disponible en este dispositivo"
+    },
+    "replaceWatchNavigation": "El botón \"Atrás\" omite los videos ya vistos",
+    "importSettings": "Importar configuración",
+    "importSettingsDescription": "Restaurar configuración desde un archivo de configuración de GoreeCloud YouTube Player",
+    "importSettingsConfirm": "Esto reemplazará tú configuración actual, lista de bloqueos, estilos de usuario y scripts personalizados. ¿Continuar?",
+    "importSettingsWithScriptsConfirm": "Este archivo contiene {{count}} script(s) personalizado(s) activado(s), que pueden ejecutar código dentro de YouTube. Continúa solo si confías en el archivo. Se reemplazará tu configuración actual, lista de bloqueos, estilos de usuario y scripts personalizados.",
+    "importSettingsDone": "Importado: {{sections}}",
+    "exportSettings": "Exportar configuración",
+    "exportSettingsDescription": "Guardar configuración, lista de bloqueos, estilos de usuario y scripts personalizados como un archivo JSON",
+    "preferencesDistractionFree": "Sin distracciones",
+    "systemCaptionStyle": {
+      "label": "Usar el estilo de subtítulos del sistema",
+      "hint": "Aplica el color, fondo y tamaño de texto de los subtítulos de Android a los subtítulos de YouTube.",
+      "openSystemSettings": "Configuración de subtítulos del sistema"
+    },
+    "groupYouTube": "YouTube",
+    "groupNouTube": "GoreeCloud YouTube Player",
+    "preferencesComments": "Comentarios",
+    "sidebar": "Barra lateral",
+    "preferencesYouTubeHint": "Preferencias de YouTube",
+    "preferencesNouTubeHint": "Preferencias de GoreeCloud YouTube Player",
+    "showSleepTimerButtonInHeader": "Mostrar botón del temporizador de suspensión en la barra de herramientas",
+    "showLibraryButtonInHeader": "Mostrar botón de la biblioteca en la barra de herramientas",
+    "showStarButtonInHeader": "Mostrar botón de estrella en la barra de herramientas",
+    "mediaNotificationButtons": "Botones de notificación multimedia",
+    "showMediaNotificationPrevButton": "Mostrar botón Anterior",
+    "showMediaNotificationNextButton": "Mostrar botón Siguiente",
+    "showMediaNotificationRewindButton": "Mostrar botón Rebobinar",
+    "showMediaNotificationForwardButton": "Mostrar botón Adelantar",
+    "showMediaNotificationSpeedButton": "Mostrar botón de velocidad de reproducción",
+    "showMediaNotificationCloseButton": "Mostrar botón Cerrar",
+    "mediaNotificationButtonsHint": "Android dibuja como máximo cuatro de estos botones junto al botón de reproducción, en el orden listado aquí. Tienes {{selected}} activados.",
+    "miniPlayerHint": "Al salir de un video, continúa reproduciéndose en una esquina de la página.",
+    "pictureInPicture": "Pantalla en pantalla",
+    "pictureInPictureHint": "Mantén la reproducción del video en una ventana flotante al salir de la aplicación.",
+    "blockAds": {
+      "label": "Bloquear anuncios",
+      "hint": "Desactívalo para permitir los anuncios de YouTube y apoyar a los creadores."
+    }
+  },
+  "native": {
+    "format_bestQuality": "Mejor calidad",
+    "format_bestQualityDesc": "Vídeo + audio hasta {{height}}p",
+    "format_1080pDesc": "1080p vídeo + audio",
+    "format_720pDesc": "720p vídeo + audio",
+    "format_audioOnly": "Solo audio",
+    "format_audio": "Audio ({{ext}})",
+    "format_audioStreamDesc": "Mejor flujo de audio",
+    "format_audioMp3Desc": "Mejor audio transcodificado a MP3",
+    "download_complete": "Descarga completada",
+    "download_failed": "Descarga fallida"
+  },
+  "sync": {
+    "label": "Sincronizar",
+    "hint": "Sincroniza marcadores entre tus teléfonos y computadoras como usuario premium.",
+    "currentPlan": "Plan actual",
+    "managePlan": "Gestionar plan"
+  },
+  "update": {
+    "check": "Buscar actualizaciones",
+    "checkHint": "Comprobar si hay una versión más reciente disponible",
+    "upToDate": "Ya tienes la última versión",
+    "downloading": "Descargando actualización v{{version}}…",
+    "error": "Error al buscar actualizaciones",
+    "downloadedTitle": "Actualización lista",
+    "downloadedHint": "Se ha descargado la versión {{version}}. ¿Reiniciar ahora para instalar?"
+  },
+  "bookmarks": {
+    "removed": "Marcador eliminado",
+    "moved": "Movido a {{folder}}",
+    "movedToRoot": "Movido fuera de la carpeta"
+  },
+  "folders": {
+    "removed": "Carpeta {{name}} eliminada"
+  },
+  "pageLoadError": {
+    "title": "No se puede cargar esta página",
+    "description": "Comprueba tú conexión e inténtalo de nuevo."
+  },
+  "extension": {
+    "openOptions": "Lista de bloqueos y estilos de usuario",
+    "reloadTabs": "Recargar pestañas de YouTube",
+    "applyHint": "Algunas opciones solo surten efecto en la siguiente carga de la página.",
+    "userScriptsUnavailable": "Los scripts de usuario necesitan el permiso de scripts de usuario del navegador. En Chrome, abre la página de detalles de la extensión y permite los scripts de usuario.",
+    "feeds": "Feeds",
+    "library": "Biblioteca",
+    "signIn": "Iniciar sesión",
+    "signedOut": "Sin iniciar sesión",
+    "syncNow": "Sincronizar ahora",
+    "refreshFeeds": "Actualizar fuentes",
+    "manageFeeds": "Gestionar fuentes",
+    "account": "Cuenta y sincronización",
+    "more": "Más",
+    "openExpanded": "Abrir en otra pestaña",
+    "openYouTube": "Abrir YouTube",
+    "openYouTubeMusic": "Abrir YouTube Music",
+    "saveCurrentPage": "Guardar página actual"
+  },
+  "history": {
+    "cleared": "Historial borrado"
+  }
+}

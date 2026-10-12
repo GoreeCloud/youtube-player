@@ -1,0 +1,288 @@
+{
+  "about": {
+    "label": "Über",
+    "code": "Quellcode",
+    "donate": "Spenden",
+    "updates": "Aktualisierungen"
+  },
+  "buttons": {
+    "clear": "Löschen",
+    "import": "Importieren",
+    "export": "Exportieren",
+    "open": "Öffnen",
+    "cancel": "Abbrechen",
+    "openUrl": "URL öffnen",
+    "move": "Verschieben",
+    "save": "Speichern",
+    "signOut": "Abmelden",
+    "remove": "Entfernen",
+    "next": "Weiter",
+    "show": "Anzeigen",
+    "download": "Herunterladen",
+    "browse": "Durchsuchen",
+    "updating": "Wird aktualisiert ...",
+    "unsubscribe": "Deabonnieren",
+    "updateYtDlp": "yt-dlp aktualisieren",
+    "ytDlpUpdated": "yt-dlp ist auf dem neuesten Stand",
+    "clearAll": "Alles leeren",
+    "undo": "Rückgängig",
+    "retry": "Erneut versuchen"
+  },
+  "library": {
+    "videos": "Videos",
+    "channels": "Kanäle",
+    "playlists": "Wiedergabelisten",
+    "songs": "Lieder",
+    "artists": "Künstler"
+  },
+  "menus": {
+    "edit": "Bearbeiten",
+    "remove": "Entfernen",
+    "reload": "Neu laden",
+    "share": "Teilen",
+    "pip": "Bild-in-Bild",
+    "duplicateTab": "Tab duplizieren",
+    "close": "Schließen",
+    "tools": "Werkzeuge",
+    "on": "Ein",
+    "off": "Aus",
+    "openInNewTab": "In neuem Tab öffnen",
+    "unsubscribe": "Deabonnieren",
+    "moveTo": "Verschieben nach …"
+  },
+  "modals": {
+    "editBookmark": "Lesezeichen bearbeiten",
+    "title": "Titel",
+    "folder": "Ordner",
+    "ungrouped": "Nicht gruppiert",
+    "history": "Verlauf",
+    "queue": "Warteschlange",
+    "feeds": "Feeds",
+    "playbackQuality": "Wiedergabequalität",
+    "playbackSpeed": "Wiedergabegeschwindigkeit",
+    "downloadFailed": "Herunterladen fehlgeschlagen",
+    "starting": "Wird gestartet ...",
+    "downloadComplete": "Herunterladen abgeschlossen",
+    "downloadVideo": "Video herunterladen",
+    "noFolder": "Kein Ordner",
+    "downloadErrorUnavailable": "Dieses Video ist nicht verfügbar.",
+    "showAllFormats": "Alle Formate anzeigen",
+    "showFewerFormats": "Weniger Formate anzeigen",
+    "pinnedFormat": "Angeheftet",
+    "sharePageUrl": "Seiten-URL",
+    "shareVideoUrl": "Video-URL",
+    "shareIncludePosition": "Aktuelle Position miteinbeziehen",
+    "downloadUseCookies": "Meine Cookies verwenden",
+    "downloadUseCookiesHint": "Erforderlich für altersbeschränkte, nur für Mitglieder zugängliche oder private Videos. Möglicherweise wirst du dadurch bei YouTube abgemeldet, und die Nutzung eines Kontos auf diese Weise birgt das Risiko, dass es als verdächtig markiert wird.",
+    "downloadErrorBlocked": "YouTube hat diesen Download abgelehnt. Es wird ein Token benötigt, das yt-dlp derzeit noch nicht generieren kann, daher kann dieses Video vorerst nicht heruntergeladen werden – die meisten anderen Videos funktionieren weiterhin.",
+    "downloadErrorSignIn": "YouTube verlangt für dieses Video, dass du angemeldet bist. Aktiviere die Option „Meine Cookies verwenden“ und versuche es erneut.",
+    "downloadErrorFormat": "Dieses Format ist nicht mehr verfügbar. Lade die Formate erneut und wähle ein anderes aus.",
+    "downloadErrorNetwork": "YouTube konnte nicht erreicht werden. Überprüfe deine Verbindung und versuche es erneut.",
+    "failedToLoadFormats": "Das Laden der Formate ist fehlgeschlagen"
+  },
+  "settings": {
+    "label": "Einstellungen",
+    "general": "Allgemein",
+    "restoreOnStart": "Letzte Sitzung beim Start wiederherstellen",
+    "watchHistory": "Verlauf ansehen",
+    "theme": {
+      "label": "Thema",
+      "system": "System",
+      "dark": "Dunkel",
+      "light": "Hell",
+      "hint": "Starte manuell neu, wenn die Änderung nicht in der Webansicht angezeigt wird."
+    },
+    "login": {
+      "label": "Versuche dies, wenn du dich nicht über die Webansicht anmelden konntest",
+      "button": "Bei YouTube anmelden"
+    },
+    "openUrlLabel": "Unterstützte URL direkt öffnen",
+    "webview": {
+      "clearLabel": "Webansicht-Daten löschen"
+    },
+    "importList": "Liste mit Links importieren",
+    "exportLabel": "Lesezeichen als CSV-Datei exportieren",
+    "hideShorts": "Shorts verstecken",
+    "channelsFeed": "Kanäle feed",
+    "importTakeout": "Import von YouTube takeout",
+    "injectCookie": "Cookie einfügen, falls die Anmeldung über die Webansicht fehlschlägt",
+    "injectCookieTitle": "Füge den Authentifizierungs-Cookie in die Webansicht ein",
+    "injectCookieHint": "Kopieren Sie den Wert des Cookie-Headers aus Ihrem Browser auf dem PC. Dies ist eine Notlösung, falls Sie sich nicht mit E-Mail-Adresse und Passwort anmelden konnten.",
+    "userAgent": {
+      "title": "Benutzerdefinierter Benutzer-Agent",
+      "default": "Standard-Benutzer-Agent"
+    },
+    "tools": "Werkzeuge",
+    "appearance": "Aussehen",
+    "preferencesContent": "Inhaltt",
+    "preferencesPlayback": "Wiedergabe & Anzeige",
+    "preferencesGeneral": "Allgemein",
+    "showBackButtonInHeader": "Zurück-Schaltfläche in der Symbolleiste anzeigen",
+    "proxy": {
+      "enabled": "Proxy aktivieren",
+      "type": "Proxy-Typ",
+      "host": "Proxy-Host",
+      "port": "Proxy-Port",
+      "hostPlaceholder": "z. B. 127.0.0.1 oder proxy.example.com",
+      "portPlaceholder": "z. B. 1080",
+      "label": "Proxy"
+    },
+    "preferences": "Voreinstellungen",
+    "preferencesDistractionFree": "Ablenkungsfrei",
+    "appearanceHint": "Werkzeugleiste, Sprache und Thema.",
+    "transfer": "Import & Export",
+    "toolbar": "Werkzeugleiste",
+    "headerPosition": {
+      "label": "Werkzeugleistenposition",
+      "top": "Oben",
+      "bottom": "Unten"
+    },
+    "toolbarButtons": "Werkzeugleistenschaltflächen",
+    "translation": {
+      "enable": "Kommentare übersetzen",
+      "targetLanguage": "Übersetzen nach",
+      "appLanguage": "App",
+      "systemLanguage": "System",
+      "notSelected": "Sprache auswählen",
+      "chooseLanguage": "Zuerst eine Übersetzungssprache auswählen",
+      "loading": "Wird übersetzt …",
+      "copy": "Übersetzung kopieren",
+      "copySource": "Quelle kopieren",
+      "pin": "Übersetzung anheften",
+      "unpin": "Übersetzung loslösen",
+      "failed": "Dieser Text konnte nicht übersetzt werden",
+      "unsupported": "Das Sprachpaar ist auf diesem Gerät nicht verfügbar"
+    },
+    "preferH264": "H.264 bevorzugen (VP9/AV1 blockieren)",
+    "showOriginalVideoTitle": "Originaltitel des Videos anzeigen",
+    "clickbaitThumbnail": {
+      "optionDefault": "Standard",
+      "optionFrame": "Bild {{n}}"
+    },
+    "blocklist": {
+      "label": "Sperrliste",
+      "hint": "YouTube-Videos nach Kanal oder Schlüsselwort im Titel ausblenden.",
+      "channels": "Kanäle",
+      "keywords": "Schlüsselwörter",
+      "channelPlaceholder": "Kanalname, Handle oder URL",
+      "keywordPlaceholder": "Schlüsselwort im Titel",
+      "emptyChannels": "Noch keine gesperrten Kanäle.",
+      "emptyKeywords": "Noch keine gesperrten Schlüsselwörter.",
+      "add": "Hinzufügen"
+    },
+    "userStyles": {
+      "label": "Benutzerstile und -skripte",
+      "add": "Stil hinzufügen",
+      "addTitle": "Benutzerstil hinzufügen",
+      "editTitle": "Benutzerstil bearbeiten",
+      "nameLabel": "Name",
+      "namePlaceholder": "Mein Stil",
+      "validation": {
+        "css": "CSS darf nicht leer sein"
+      },
+      "scripts": {
+        "add": "Skript hinzufügen",
+        "addTitle": "Benutzerskript hinzufügen",
+        "editTitle": "Benutzerskript bearbeiten",
+        "namePlaceholder": "Mein Skript",
+        "run": "Ausführen",
+        "runComplete": "Skript ausgeführt",
+        "runFailed": "Skript fehlgeschlagen",
+        "import": "Importieren",
+        "pinToHeader": "An Werkzeugleiste anheften",
+        "pinToHeaderHint": "Dieses Skript als Werkzeugleistenaktion anzeigen.",
+        "pinnedToHeader": "An Werkzeugleiste angeheftet",
+        "validation": {
+          "js": "JavaScript darf nicht leer sein"
+        }
+      }
+    },
+    "language": {
+      "label": "Sprache",
+      "system": "System",
+      "hint": "Sprache auswählen oder Systemsprache folgen."
+    },
+    "importSettings": "Einstellungen importieren",
+    "importSettingsDescription": "Einstellungen aus einer GoreeCloud YouTube Player-Einstellungsdatei wiederherstellen",
+    "importSettingsDone": "Importiert: {{sections}}",
+    "exportSettings": "Einstellungen exportieren",
+    "groupYouTube": "YouTube",
+    "groupNouTube": "GoreeCloud YouTube Player",
+    "preferencesComments": "Kommentare",
+    "sidebar": "Seitenleiste",
+    "preferencesYouTubeHint": "YouTube-Voreinstellungen",
+    "preferencesNouTubeHint": "GoreeCloud YouTube Player-Voreinstellungen"
+  },
+  "sync": {
+    "label": "Synchronisieren",
+    "hint": "Als Premium-Nutzer können Sie Ihre Lesezeichen auf all Ihren Smartphones und Computern synchronisieren.",
+    "currentPlan": "Aktueller Plan",
+    "managePlan": "Plan verwalten"
+  },
+  "sleepTimer": {
+    "off": "Aus",
+    "endsIn": "Endet in {{value}}",
+    "preset": "{{value}} min",
+    "customPlaceholder": "Benutzerdefinierte Minuten",
+    "replace": "Ersetzen"
+  },
+  "changelog": {
+    "label": "Änderungsprotokoll",
+    "current": "Aktuell",
+    "loading": "Versionshinweise werden geladen ...",
+    "retry": "Erneut versuchen",
+    "empty": "Keine Versionshinweise gefunden.",
+    "noNotes": "Für diese Version wurden keine Versionshinweise bereitgestellt.",
+    "hint": "Kürzliche Veröffentlichungen und Fehlerbehebungen von GitHub."
+  },
+  "update": {
+    "check": "Auf Aktualisierungen prüfen",
+    "downloading": "Aktualisierung v{{version}} wird heruntergeladen …",
+    "downloadedTitle": "Aktualisierung bereit",
+    "checkHint": "Nachsehen, ob eine neuere Version verfügbar ist",
+    "upToDate": "Du bist auf der neuesten Version",
+    "error": "Die Überprüfung auf Aktualisierungen ist fehlgeschlagen",
+    "downloadedHint": "Version {{version}} wurde heruntergeladen. Möchtest du jetzt neu starten, um die Installation durchzuführen?"
+  },
+  "feeds": {
+    "updates": "Aktualisierungen",
+    "manage": "Verwalten",
+    "sortLastVideo": "Letztes Video",
+    "lastVideoLabel": "Letztes Video",
+    "videosPerDay": "{{value}} Videos/Tag",
+    "never": "Nie",
+    "allFolders": "Alle",
+    "newFolder": "+ Neuer Ordner",
+    "frequencyLabel": "Häufigkeit",
+    "sortFrequency": "Häufigkeit",
+    "lastVideoNewest": "Letztes Video: Neueste zuerst",
+    "lastVideoOldest": "Letztes Video: Älteste zuerst",
+    "frequencyHighest": "Häufigkeit: Höchste zuerst",
+    "frequencyLowest": "Häufigkeit: Niedrigste zuerst",
+    "filterDropdownPlaceholder": "Ordner und Kanäle filtern",
+    "emptyTitleFolder": "Keine neuen Beiträge in {{folder}}",
+    "emptyTitleChannel": "Keine neuen Beiträge von {{channel}}",
+    "emptyActionFetchNow": "Jetzt abrufen",
+    "fetchToastRunning": "Auffrischen läuft bereits",
+    "emptyActionAllFolders": "Alles anzeigen",
+    "removeTitle": "{{title}} entfernen?"
+  },
+  "bookmarks": {
+    "removed": "Lesezeichen entfernt",
+    "moved": "Nach {{folder}} verschoben",
+    "movedToRoot": "Aus dem Ordner heraus verschoben"
+  },
+  "folders": {
+    "removed": "Ordner {{name}} entfernt"
+  },
+  "native": {
+    "format_bestQuality": "Beste Qualität",
+    "format_bestQualityDesc": "Bis zu {{height}}p Video + Audio",
+    "format_1080pDesc": "1080p Video + Audio",
+    "format_720pDesc": "720p Video + Audio",
+    "format_audioOnly": "Nur Audio",
+    "format_audio": "Audio ({{ext}})",
+    "download_complete": "Herunterladen abgeschlossen",
+    "download_failed": "Herunterladen fehlgeschlagen"
+  }
+}

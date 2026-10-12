@@ -1,0 +1,139 @@
+import { auth$ } from '@/states/auth'
+import { MainPageContent } from './MainPageContent'
+import { supabase } from '@/lib/supabase/client'
+import { listenIosTransactions, reconcileIosTransactions } from '@/lib/ios-billing'
+import { useEffect, useState } from 'react'
+import { ui$ } from '@/states/ui'
+import { useValue } from '@legendapp/state/react'
+import { QueryClientProvider } from '@tanstack/react-query'
+import { queryClient } from '@/lib/query/client'
+import { BookmarkModal } from '../modal/BookmarkModal'
+import { FolderModal } from '../modal/FolderModal'
+import { HistoryModal } from '../modal/HistoryModal'
+import { LibraryModal } from '../modal/LibraryModal'
+import { QueueModal } from '../modal/QueueModal'
+import { SettingsModal } from '../modal/SettingsModal'
+import { feederLoop } from '@/lib/feeder'
+import { listenFeedNotifications } from '@/lib/feed-notifications'
+import { FeedModal } from '../modal/FeedModal'
+import { UrlModal } from '../modal/UrlModal'
+import { CookieModal } from '../modal/CookieModal'
+import { UserAgentModal } from '../modal/UserAgentModal'
+import { SleepTimerModal } from '../modal/SleepTimerModal'
+import { PlaybackSpeedModal } from '../modal/PlaybackSpeedModal'
+import { PlaybackQualityModal } from '../modal/PlaybackQualityModal'
+import { ToolsModal } from '../modal/ToolsModal'
+import { ShareModal } from '../modal/ShareModal'
+import { useLocales } from 'expo-localization'
+import { changeLanguage, t as i18nextT } from 'i18next'
+import NouTubeViewModule from '@/modules/nou-tube-view'
+import { isWeb, nIf } from '@/lib/utils'
+import { resolveI18nLanguageFromExpoLocale } from '@/lib/i18n'
+import { settings$ } from '@/states/settings'
+import { TranslationCard } from '../translation/TranslationCard'
+import { MoveBookmarkModal } from '../modal/MoveBookmarkModal'
+import { UndoToast } from '../UndoToast'
+import { Toast } from '../Toast'
+import { AppState } from 'react-native'
+
+export const MainPage: React.FC<{ contentJs: string }> = ({ contentJs }) => {
+  useEffect(() => listenFeedNotifications(() => ui$.feedModalOpen.set(true)), [])
+  const feedNotificationsEnabled = useValue(settings$.feedNotificationsEnabled)
+  const feedsEnabled = useValue(settings$.feedsEnabled)
+  useEffect(() => {
+    if (!feedsEnabled || !feedNotificationsEnabled) return
+    const refresh = () => { void feederLoop() }
+    refresh()
+    const timer = setInterval(refresh, 2 * 3600 * 1000)
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active') refresh()
+    })
+    return () => {
+      clearInterval(timer)
+      subscription.remove()
+    }
+  }, [feedsEnabled, feedNotificationsEnabled])
+  const locales = useLocales()
+  // Nothing may cover the video while Android has the app pinned to it.
+  const pictureInPicture = useValue(ui$.pictureInPicture)
+  const primaryLocale = locales[0]
+  const selectedLanguage = useValue(settings$.language)
+  const systemLanguage = resolveI18nLanguageFromExpoLocale(primaryLocale) || 'en'
+  const [, setLanguageRevision] = useState(0)
+
+  useEffect(() => {
+    let active = true
+
+    const apply = async () => {
+      await changeLanguage(selectedLanguage || systemLanguage)
+      if (!active) {
+        return
+      }
+      if (!isWeb) {
+        const strings = i18nextT('native', { returnObjects: true }) as Record<string, string>
+        NouTubeViewModule.setLocaleStrings(strings)
+      }
+      setLanguageRevision((revision) => revision + 1)
+    }
+    void apply()
+
+    return () => {
+      active = false
+    }
+  }, [
+    primaryLocale?.languageCode,
+    primaryLocale?.languageScriptCode,
+    primaryLocale?.regionCode,
+    selectedLanguage,
+    systemLanguage,
+  ])
+
+  useEffect(() => {
+    supabase.auth.onAuthStateChange((event, session) => {
+      // console.log('onAuthStateChange', event, session)
+      auth$.assign({
+        loaded: true,
+        userId: session?.user.id,
+        userEmail: session?.user.email,
+        user: session?.user.user_metadata,
+        accessToken: session?.access_token,
+      })
+      if (session && (event === 'INITIAL_SESSION' || event === 'SIGNED_IN')) {
+        void reconcileIosTransactions()
+      }
+    })
+
+    feederLoop()
+    return listenIosTransactions()
+  }, [])
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <MainPageContent contentJs={contentJs} />
+      {nIf(
+        !pictureInPicture,
+        <>
+          <LibraryModal />
+          <FeedModal />
+          <BookmarkModal />
+          <MoveBookmarkModal />
+          <FolderModal />
+          <HistoryModal />
+          <QueueModal />
+          {nIf(!isWeb, <SettingsModal />)}
+          <UrlModal />
+          <CookieModal />
+          <UserAgentModal />
+          <SleepTimerModal />
+          <PlaybackSpeedModal />
+          <PlaybackQualityModal />
+          <ToolsModal />
+          <ShareModal />
+          {nIf(!isWeb, <TranslationCard />)}
+          <UndoToast />
+          <Toast />
+        </>,
+      )}
+    </QueryClientProvider>
+  )
+}
