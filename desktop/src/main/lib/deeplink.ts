@@ -7,10 +7,13 @@ import { isSupportedUrl } from '@/lib/supported-url'
 const pendingDeeplinks: string[] = []
 
 function findLaunchUrl(args: string[]): string | undefined {
-  return args.find((arg) => arg.startsWith('noutube:') || isSupportedUrl(arg))
+  return args.find(isSupportedUrl)
 }
 
 function handleLaunchUrl(url: string): void {
+  // OS protocol callbacks are untrusted; reject before queuing or IPC.
+  if (!isSupportedUrl(url)) return
+
   if (mainWindow) {
     void uiClient.handleDeeplink(url)
   } else {
