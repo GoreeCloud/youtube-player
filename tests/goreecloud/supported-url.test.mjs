@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { isSupportedUrl, isSafeExternalUrl, findSupportedLaunchUrl, getSupportedVideoId, normalizeSupportedUrl } from '../../lib/supported-url.ts'
+import { isSupportedUrl, isSafeExternalUrl, findSupportedLaunchUrl, getSupportedVideoId, expandShortUrl, normalizeSupportedUrl } from '../../lib/supported-url.ts'
 
 test('allows approved YouTube hosts with HTTPS or legacy links', () => {
   for (const input of [
@@ -107,5 +107,32 @@ test('never extracts thumbnails from spoofed hosts, credentials, or invalid IDs'
     'javascript:https://www.youtube.com/watch?v=ABCDEFGHI01',
   ]) {
     assert.equal(getSupportedVideoId(url), undefined, url)
+  }
+})
+
+
+test('canonicalizes only a single trusted youtu.be video path', () => {
+  assert.equal(
+    expandShortUrl('https://youtu.be/ABC_def-12?t=45&list=PL123&v=spoofed'),
+    'https://www.youtube.com/watch?v=ABC_def-12&t=45&list=PL123',
+  )
+  assert.equal(
+    expandShortUrl('noutube://youtu.be/ABCDEFGHI01?t=30'),
+    'https://www.youtube.com/watch?v=ABCDEFGHI01&t=30',
+  )
+})
+
+test('does not rewrite ambiguous, untrusted, or ordinary watch URLs', () => {
+  for (const input of [
+    'https://youtu.be/ABC_def-12/extra?t=10',
+    'https://youtu.be/invalid%20id?t=10',
+    'https://user@youtu.be/ABCDEFGHI01',
+    'https://youtu.be.evil.example/ABCDEFGHI01',
+    'https://youtu.be:444/ABCDEFGHI01',
+    'javascript:https://youtu.be/ABCDEFGHI01',
+    'https://www.youtube.com/watch?v=ABCDEFGHI01',
+    'not a URL',
+  ]) {
+    assert.equal(expandShortUrl(input), input)
   }
 })
