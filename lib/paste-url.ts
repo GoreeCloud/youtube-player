@@ -17,9 +17,6 @@ export function getPastedUrl(text: string) {
   if (!value) {
     return ''
   }
-  if (value.startsWith('noutube:')) {
-    return value
-  }
   const fixed = fixSharingUrl(value)
   return isSupportedUrl(fixed) ? fixed : ''
 }

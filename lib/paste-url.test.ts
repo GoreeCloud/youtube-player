@@ -18,6 +18,10 @@ describe('getPastedUrl', () => {
     expect(getPastedUrl('   ')).toBe('')
     expect(getPastedUrl('just some copied text')).toBe('')
     expect(getPastedUrl('https://example.com/watch?v=abc')).toBe('')
+    expect(getPastedUrl('noutube:javascript:alert(1)')).toBe('')
+    expect(getPastedUrl('noutube:auth?code=private')).toBe('')
+    expect(getPastedUrl('noutube://example.com/watch?v=abc')).toBe('')
+    expect(getPastedUrl('https://user@www.youtube.com/watch?v=abc')).toBe('')
   })
 })
 
