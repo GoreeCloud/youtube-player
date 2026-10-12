@@ -80,12 +80,14 @@ export function isSafeExternalUrl(value: string) {
 /* youtu.be only redirects to the watch page. Nothing that decides where a link
  * belongs recognises it as a video until it has been spelled out. */
 export function expandShortUrl(value: string) {
+  // Share-link canonicalization must obey the same host and path rules as
+  // thumbnail extraction; never silently truncate an ambiguous short path.
+  if (!isSupportedUrl(value)) return value
   try {
-    const url = new URL(value)
-    const id = url.host === 'youtu.be' ? url.pathname.split('/').filter(Boolean)[0] : ''
-    if (!id) {
-      return value
-    }
+    const url = new URL(normalizeSupportedUrl(value))
+    if (url.hostname !== 'youtu.be') return value
+    const id = getSupportedVideoId(value)
+    if (!id) return value
     const watch = new URL('https://www.youtube.com/watch')
     watch.searchParams.set('v', id)
     // The start time and the playlist ride along on the share link.
