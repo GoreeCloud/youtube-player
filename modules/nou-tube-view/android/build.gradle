@@ -1,0 +1,71 @@
+apply plugin: 'com.android.library'
+
+group = 'expo.modules.noutubeview'
+version = '0.7.2'
+
+def expoModulesCorePlugin = new File(project(":expo-modules-core").projectDir.absolutePath, "ExpoModulesCorePlugin.gradle")
+apply from: expoModulesCorePlugin
+applyKotlinExpoModulesCorePlugin()
+useCoreDependencies()
+useExpoPublishing()
+
+// If you want to use the managed Android SDK versions from expo-modules-core, set this to true.
+// The Android SDK versions will be bumped from time to time in SDK releases and may introduce breaking changes in your module code.
+// Most of the time, you may like to manage the Android SDK versions yourself.
+def useManagedAndroidSdkVersions = false
+if (useManagedAndroidSdkVersions) {
+  useDefaultAndroidSdkVersions()
+} else {
+  buildscript {
+    // Simple helper that allows the root project to override versions declared by this library.
+    ext.safeExtGet = { prop, fallback ->
+      rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+    }
+  }
+  project.android {
+    compileSdkVersion safeExtGet("compileSdkVersion", 34)
+    defaultConfig {
+      minSdkVersion safeExtGet("minSdkVersion", 21)
+      targetSdkVersion safeExtGet("targetSdkVersion", 34)
+    }
+  }
+}
+
+android {
+  namespace "expo.modules.noutubeview"
+  flavorDimensions "distribution"
+  productFlavors {
+    full {
+      dimension "distribution"
+    }
+    foss {
+      dimension "distribution"
+    }
+  }
+  defaultConfig {
+    versionCode 1
+    versionName "0.7.2"
+  }
+  lintOptions {
+    abortOnError false
+  }
+}
+
+repositories {
+  mavenCentral()
+  maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+  testImplementation 'junit:junit:4.13.2'
+  implementation 'androidx.appcompat:appcompat:1.7.0'
+  implementation "androidx.webkit:webkit:1.13.0"
+  implementation 'androidx.window:window:1.5.1'
+  implementation 'androidx.media:media:1.7.0'
+  implementation 'com.squareup.okhttp3:okhttp:4.9.2'
+  implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+  implementation 'io.github.junkfood02.youtubedl-android:library:0.17.3'
+  implementation 'io.github.junkfood02.youtubedl-android:ffmpeg:0.17.3'
+  fullImplementation 'com.google.mlkit:translate:17.0.3'
+  fullImplementation 'com.google.mlkit:language-id:17.0.6'
+}

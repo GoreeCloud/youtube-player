@@ -1,0 +1,174 @@
+import { when } from '@legendapp/state'
+import { useValue } from '@legendapp/state/react'
+import { ui$ } from '@/states/ui'
+import { BaseCenterModal } from './BaseCenterModal'
+import { NouText } from '../NouText'
+import { TextInput, View } from 'react-native'
+import { useEffect, useState } from 'react'
+import { gray } from '@radix-ui/colors'
+import { NouButton } from '../button/NouButton'
+import { t } from 'i18next'
+import { showToast } from '@/lib/toast'
+import { isWeb } from '@/lib/utils'
+import { getDocumentAsync } from 'expo-document-picker'
+import { mainClient } from '@/lib/main-client'
+import { SIGN_IN_FAQ_URL } from '@/lib/help'
+import { NouLink } from '../link/NouLink'
+import { settings$ } from '@/states/settings'
+import { isPlayerForeground, isSplitWatchEnabled } from '@/lib/split-view'
+
+// accounts.youtube.com is part of Google's sign-in flow, not a page to land on.
+const isYouTubePage = (url: string) => {
+  try {
+    const { hostname } = new URL(url)
+    return hostname !== 'accounts.youtube.com' && (hostname === 'youtube.com' || hostname.endsWith('.youtube.com'))
+  } catch {
+    return false
+  }
+}
+
+const parseCookies = (text: string) => {
+  const lines = text.split('\n')
+  const cookies: string[] = []
+  for (let line of lines) {
+    line = line.trim()
+    if (!line || line.startsWith('#')) continue
+    if (line.includes('\t')) {
+      const parts = line.split('\t')
+      if (parts.length >= 7) {
+        cookies.push(`${parts[5]}=${parts[6]}`)
+      }
+    } else {
+      const parts = line.split(';')
+      for (const part of parts) {
+        const p = part.trim()
+        if (p.includes('=')) {
+          cookies.push(p)
+        }
+      }
+    }
+  }
+  return cookies.filter(Boolean).join('; ')
+}
+
+export const CookieModal = () => {
+  const cookieModalOpen = useValue(ui$.cookieModalOpen)
+  const [text, setText] = useState('')
+  const onClose = () => ui$.cookieModalOpen.set(false)
+
+  useEffect(() => {
+    setText('')
+  }, [cookieModalOpen])
+
+  const onPickFile = async () => {
+    try {
+      const res = await getDocumentAsync({
+        type: ['text/plain', 'text/tab-separated-values'],
+        copyToCacheDirectory: true,
+      })
+      if (!res.canceled && res.assets?.[0]) {
+        const asset = res.assets[0]
+        const response = await fetch(asset.uri)
+        const content = await response.text()
+        setText(content)
+      }
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  const onSubmit = async () => {
+    const cookie = parseCookies(text.trim())
+    if (!cookie) {
+      showToast('Invalid cookie')
+      return
+    }
+
+    const webview = ui$.webview.get()
+    if (!webview) {
+      showToast('WebView not ready')
+      return
+    }
+
+    // The dialog can be opened from Google's sign-in page (see
+    // GoogleLoginNotice), where reloading shows the same page again and, on
+    // native, document.cookie cannot write .youtube.com cookies at all.
+    // Follow the url of this webview rather than the foreground one: the user
+    // can switch between the player and the browsing page while this waits.
+    const inPlayer = isSplitWatchEnabled() && isPlayerForeground()
+    const pageUrl$ = !isSplitWatchEnabled() ? ui$.pageUrl : inPlayer ? ui$.playerPageUrl : ui$.browsePageUrl
+    const onYouTube = isYouTubePage(pageUrl$.get())
+
+    if (isWeb) {
+      await mainClient.setCookie(cookie)
+      if (onYouTube) {
+        webview.executeJavaScript('location.reload()')
+      } else {
+        webview.loadURL('https://www.youtube.com')
+      }
+    } else {
+      const script =
+        cookie
+          .split(';')
+          .map((x) => `document.cookie="${x.trim()};max-age=31536000;path=/;domain=.youtube.com";`)
+          .join('') + 'location.reload();'
+
+      if (!onYouTube) {
+        onClose()
+        // The player webview only ever holds a video, so send it back to its own.
+        const playerUrl = inPlayer ? ui$.playerUrl.get() : ''
+        const home = settings$.home.get() === 'yt-music' ? 'https://music.youtube.com' : 'https://m.youtube.com'
+        webview.loadUrl(playerUrl || home)
+        const arrived = await Promise.race([
+          when(() => isYouTubePage(pageUrl$.get())).then(() => true),
+          new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 15000)),
+        ])
+        if (!arrived) {
+          showToast('Could not open YouTube to inject cookie')
+          return
+        }
+      }
+      webview.executeJavaScript(script)
+    }
+    onClose()
+    showToast('Cookie injected')
+  }
+  if (!cookieModalOpen) {
+    return null
+  }
+
+  return (
+    <BaseCenterModal onClose={onClose}>
+      <View className="p-5">
+        <NouText className="text-lg font-semibold mb-4">{t('settings.injectCookieTitle')}</NouText>
+        <NouText className="mb-4 text-gray-400 text-sm leading-5">{t('settings.injectCookieHint')}</NouText>
+        <NouLink href={SIGN_IN_FAQ_URL} className="mb-4 text-sm text-blue-600 dark:text-blue-400 underline">
+          {t('settings.cookieFaq')}
+        </NouLink>
+        <TextInput
+          className="border border-gray-600 rounded mb-6 text-white p-2 text-sm"
+          value={text}
+          onChangeText={setText}
+          placeholder={'key1=val1; key2=val2\nor\ncookies.txt'}
+          placeholderTextColor={gray.gray11}
+          multiline
+          numberOfLines={3}
+          autoFocus
+        />
+        <View className="flex-row items-center justify-between">
+          <View className="flex-row items-center gap-2">
+            <NouButton variant="outline" size="1" onPress={onClose}>
+              {t('buttons.cancel')}
+            </NouButton>
+            <NouButton variant="soft" size="1" onPress={onPickFile}>
+              {t('buttons.import')}
+            </NouButton>
+          </View>
+          <NouButton size="1" onPress={onSubmit}>
+            {t('buttons.save')}
+          </NouButton>
+        </View>
+      </View>
+    </BaseCenterModal>
+  )
+}

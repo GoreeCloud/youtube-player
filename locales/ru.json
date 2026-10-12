@@ -1,0 +1,479 @@
+{
+  "about": {
+    "label": "О программе",
+    "code": "Исходный код",
+    "donate": "Пожертвовать",
+    "hint": "Информация о версии, обновления, исходный код и ссылки на поддержку.",
+    "updates": "Обновления"
+  },
+  "buttons": {
+    "clear": "Очистить",
+    "import": "Импорт",
+    "export": "Экспорт",
+    "open": "Открыть",
+    "cancel": "Отмена",
+    "openUrl": "Открыть URL",
+    "move": "Переместить",
+    "save": "Сохранить",
+    "signOut": "Выйти",
+    "remove": "Удалить",
+    "unsubscribe": "Отписаться",
+    "clearAll": "Очистить всё",
+    "next": "Далее",
+    "show": "Показать",
+    "download": "Скачать",
+    "browse": "Обзор",
+    "updateYtDlp": "Обновить yt-dlp",
+    "updating": "Обновление...",
+    "ytDlpUpdated": "yt-dlp уже обновлён",
+    "undo": "Отменить",
+    "retry": "Повторить",
+    "confirm": "Подтвердить"
+  },
+  "library": {
+    "videos": "Видео",
+    "channels": "Каналы",
+    "playlists": "Плейлисты",
+    "songs": "Треки",
+    "artists": "Исполнители"
+  },
+  "menus": {
+    "edit": "Изменить",
+    "remove": "Удалить",
+    "reload": "Перезагрузить",
+    "share": "Поделиться",
+    "unsubscribe": "Отписаться",
+    "tools": "Инструменты",
+    "desktop": "Версия для ПК",
+    "on": "Вкл",
+    "off": "Выкл",
+    "openInNewTab": "Открыть в новой вкладке",
+    "pip": "Картинка в картинке",
+    "duplicateTab": "Дублировать вкладку",
+    "close": "Закрыть",
+    "moveTo": "Переместить в…",
+    "star": "В избранное",
+    "unstar": "Убрать из избранного",
+    "download": "Скачать"
+  },
+  "modals": {
+    "editBookmark": "Изменить закладку",
+    "title": "Заголовок",
+    "folder": "Папка",
+    "ungrouped": "Без группы",
+    "feeds": "Ленты",
+    "history": "История",
+    "queue": "Очередь",
+    "downloadVideo": "Скачать видео",
+    "downloadsFolder": "Папка загрузок",
+    "activeDownloads": "Активные загрузки",
+    "starting": "Запускаем...",
+    "downloadComplete": "Загрузка завершена",
+    "downloadFailed": "Ошибка загрузки",
+    "failedToLoadFormats": "Не удалось загрузить форматы",
+    "playbackSpeed": "Скорость воспроизведения",
+    "downloadHistory": "История загрузок",
+    "playbackQuality": "Качество воспроизведения",
+    "sharePageUrl": "URL страницы",
+    "shareVideoUrl": "URL видео",
+    "shareIncludePosition": "Включить текущее время",
+    "downloadUseCookies": "Использовать мои файлы cookie",
+    "downloadUseCookiesHint": "Необходимо для видео с возрастными ограничениями, только для спонсоров или с ограниченным доступом. Это может привести к выходу из аккаунта YouTube, а подобное использование аккаунта несёт риск его блокировки.",
+    "noFolder": "Без папки",
+    "downloadErrorBlocked": "YouTube отклонил это скачивание. Требуется токен, который yt-dlp пока не может сгенерировать, поэтому данное видео сейчас скачать нельзя — большинство других видео по-прежнему работают.",
+    "downloadErrorSignIn": "YouTube требует авторизацию для этого видео. Включите \"Использовать мои файлы cookie\" и попробуйте снова.",
+    "downloadErrorFormat": "Этот формат больше недоступен. Загрузите список форматов заново и выберите другой.",
+    "downloadErrorUnavailable": "Это видео недоступно.",
+    "downloadErrorNetwork": "Не удалось подключиться к YouTube. Проверьте подключение к сети и попробуйте снова.",
+    "showAllFormats": "Показать все форматы",
+    "showFewerFormats": "Показать меньше форматов",
+    "pinnedFormat": "Закреплено",
+    "pinFormat": "Закрепить как формат по умолчанию",
+    "unpinFormat": "Открепить формат по умолчанию"
+  },
+  "settings": {
+    "label": "Настройки",
+    "general": "Общие",
+    "restoreOnStart": "Восстанавливать последнюю сессию при запуске",
+    "hideShorts": "Скрыть Shorts в ленте",
+    "channelsFeed": "Лента каналов",
+    "watchHistory": "История просмотра",
+    "theme": {
+      "label": "Тема",
+      "system": "Системная",
+      "dark": "Тёмная",
+      "light": "Светлая",
+      "hint": "Применяется к приложению и YouTube. Перезапустите вручную, если изменения не отобразились в webview."
+    },
+    "login": {
+      "label": "Попробуйте это, если не удается войти через webview",
+      "button": "Войти в YouTube"
+    },
+    "openUrlLabel": "Открывать поддерживаемые URL напрямую",
+    "webview": {
+      "clearLabel": "Очистить данные webview"
+    },
+    "importList": "Импортировать список ссылок",
+    "importTakeout": "Импортировать из YouTube takeout",
+    "exportLabel": "Экспортировать закладки в CSV-файл",
+    "injectCookie": "Внедрить cookie, если не удается войти через webview",
+    "injectCookieTitle": "Внедрить cookie авторизации в webview",
+    "injectCookieHint": "Скопируйте значение заголовка Cookie из вашего браузера на ПК. Используйте этот способ, если не удается войти с помощью email/пароля.",
+    "userAgent": {
+      "default": "User-Agent по умолчанию",
+      "title": "Пользовательский User-Agent"
+    },
+    "hubHint": "Воспроизведение, синхронизация, импорт и инструменты webview в одном месте.",
+    "generalHint": "Настройки воспроизведения, внешний вид, инструменты и перенос данных.",
+    "preferences": "Параметры",
+    "preferencesHint": "Поведение воспроизведения, ленты и истории.",
+    "appearance": "Внешний вид",
+    "appearanceHint": "Панель инструментов, язык и тема.",
+    "tools": "Инструменты",
+    "toolsHint": "Управление средой webview и другими инструментами.",
+    "transfer": "Импорт и экспорт",
+    "transferHint": "Импортируйте закладки или перенесите их с собой.",
+    "syncHintShort": "Аккаунт, управление планом и синхронизация между устройствами.",
+    "autoHideHeader": "Скрывать и показывать панель инструментов в зависимости от направления прокрутки",
+    "hideShortsInNavbar": "Скрыть Shorts в панели навигации",
+    "hideMixPlaylist": "Скрыть миксы",
+    "userStyles": {
+      "label": "Пользовательские стили и скрипты",
+      "hint": "Ваши собственные CSS-стили и пользовательские скрипты для сайта.",
+      "builtin": {
+        "label": "Встроенные стили",
+        "hideShortsInNavbar": {
+          "label": "Скрыть Shorts в панели навигации"
+        },
+        "hideMixPlaylist": {
+          "label": "Скрыть миксы"
+        },
+        "hideCommunityPosts": {
+          "label": "Скрыть записи сообщества"
+        },
+        "hideAskButton": {
+          "label": "Скрыть кнопку «Спросить Gemini»"
+        },
+        "hideHomeFeed": {
+          "label": "Скрыть главную ленту"
+        },
+        "hideRelatedVideos": {
+          "label": "Скрыть похожие видео"
+        },
+        "hideEndScreens": {
+          "label": "Скрыть конечные заставки"
+        }
+      },
+      "custom": {
+        "label": "Свои стили",
+        "empty": "Пока нет добавленных стилей."
+      },
+      "add": "Добавить стиль",
+      "addTitle": "Добавление стиля",
+      "editTitle": "Изменение стиля",
+      "nameLabel": "Название",
+      "namePlaceholder": "Мой стиль",
+      "validation": {
+        "css": "CSS не может быть пустым"
+      },
+      "deleteConfirm": "Удалить этот стиль?",
+      "copyCss": "Копировать CSS",
+      "cssCopied": "CSS скопирован",
+      "copyFailed": "Не удалось скопировать CSS",
+      "importFailed": "Не удалось импортировать CSS",
+      "scripts": {
+        "label": "Свои скрипты",
+        "empty": "Пока нет добавленных скриптов.",
+        "add": "Добавить скрипт",
+        "addTitle": "Добавление скрипта",
+        "editTitle": "Изменение скрипта",
+        "namePlaceholder": "Мой скрипт",
+        "run": "Выполнить",
+        "runComplete": "Скрипт выполнен",
+        "runFailed": "Ошибка выполнения скрипта",
+        "import": "Импортировать",
+        "importFailed": "Не удалось импортировать скрипт",
+        "pinToHeader": "Закрепить на панели инструментов",
+        "pinToHeaderHint": "Показывать этот скрипт как действие на панели инструментов.",
+        "pinnedToHeader": "Закреплено на панели инструментов",
+        "deleteConfirm": "Удалить этот скрипт?",
+        "noActiveTab": "Нет активного webview",
+        "validation": {
+          "js": "JavaScript не может быть пустым"
+        },
+        "runAtStart": "Выполнять при старте документа",
+        "runAtStartHint": "Выполнять до построения DOM, а не после события DOMContentLoaded.",
+        "runAtStartDesktopHint": "Пока недоступно в десктопной версии; скрипты выполняются после готовности DOM.",
+        "runAtStartBadge": "Выполняется при старте документа"
+      },
+      "builtinScripts": {
+        "label": "Встроенные скрипты",
+        "fixEncodedAuthorNames": {
+          "label": "Исправлять спецсимволы в именах авторов"
+        }
+      }
+    },
+    "hideToolbarWhenScrolled": "Скрывать панель инструментов, если страница не вверху",
+    "language": {
+      "label": "Язык",
+      "system": "Системный",
+      "hint": "Выберите язык или используйте системный язык."
+    },
+    "miniPlayer": "Мини-плеер",
+    "preferH264": "Предпочитать H.264 (блокировать VP9/AV1)",
+    "clickbaitThumbnail": {
+      "label": "Избегать кликбейтных превью",
+      "hint": "Заменять превью от автора автоматически сгенерированными кадрами из видео",
+      "optionDefault": "По умолчанию",
+      "optionFrame": "Кадр {{n}}"
+    },
+    "autoHideSidebar": "Автоматически скрывать боковую панель и показывать при наведении",
+    "headerPosition": {
+      "label": "Положение панели инструментов",
+      "top": "Сверху",
+      "bottom": "Снизу"
+    },
+    "showHomeButtonInHeader": "Показывать кнопку «Главная» на панели инструментов",
+    "showBackButtonInHeader": "Показывать кнопку «Назад» на панели инструментов",
+    "showForwardButtonInHeader": "Показывать кнопку «Вперед» на панели инструментов",
+    "showDislikes": "Показывать дизлайки",
+    "showOriginalVideoTitle": "Показывать оригинальное название видео",
+    "blocklist": {
+      "label": "Черный список",
+      "hint": "Скрывать видео на YouTube по каналу или ключевому слову в названии.",
+      "channels": "Каналы",
+      "keywords": "Ключевые слова",
+      "channelPlaceholder": "Название канала, псевдоним или URL",
+      "keywordPlaceholder": "Ключевое слово в названии",
+      "emptyChannels": "Пока нет заблокированных каналов.",
+      "emptyKeywords": "Пока нет заблокированных ключевых слов.",
+      "add": "Добавить",
+      "channelsNote": "Точное совпадение по названию, псевдониму или ID канала.",
+      "keywordsNote": "Совпадение ключевых слов по вхождению (поиск подстроки в названиях)."
+    },
+    "preferencesContent": "Контент",
+    "preferencesPlayback": "Воспроизведение и отображение",
+    "preferencesGeneral": "Общие",
+    "pullToRefresh": "Потяните для обновления",
+    "showReloadButtonInHeader": "Показывать кнопку «Перезагрузить» на панели инструментов",
+    "zoom": {
+      "label": "Масштаб текста",
+      "defaultLabel": "Масштаб текста",
+      "defaultHint": "Изменение размера текста на страницах YouTube."
+    },
+    "proxy": {
+      "label": "Прокси",
+      "enabled": "Включить прокси",
+      "type": "Тип прокси",
+      "host": "Адрес прокси",
+      "port": "Порт прокси",
+      "hostPlaceholder": "например, 127.0.0.1 или proxy.example.com",
+      "portPlaceholder": "например, 1080"
+    },
+    "toolbar": "Панель инструментов",
+    "toolbarButtons": "Кнопки панели инструментов",
+    "showHistoryButtonInHeader": "Показывать кнопку «История» на панели инструментов",
+    "doubleTapToToggleHeader": "Скрывать и показывать панель инструментов двойным касанием страницы",
+    "translation": {
+      "enable": "Перевод комментариев",
+      "hint": "Показывать кнопку для перевода комментариев на вашем устройстве.",
+      "targetLanguage": "Переводить на",
+      "appLanguage": "Язык приложения",
+      "systemLanguage": "Язык системы",
+      "notSelected": "Выберите язык",
+      "chooseLanguage": "Сначала выберите язык перевода",
+      "loading": "Перевод…",
+      "copy": "Скопировать перевод",
+      "copySource": "Скопировать оригинал",
+      "pin": "Закрепить перевод",
+      "unpin": "Открепить перевод",
+      "failed": "Не удалось перевести текст",
+      "unsupported": "Эта языковая пара недоступна на этом устройстве"
+    },
+    "replaceWatchNavigation": "Кнопка «Назад» пропускает просмотренные видео",
+    "importSettings": "Импортировать настройки",
+    "importSettingsDescription": "Восстановить настройки из файла настроек GoreeCloud YouTube Player",
+    "importSettingsConfirm": "Это действие заменит ваши текущие настройки, черный список, пользовательские стили и скрипты. Продолжить?",
+    "importSettingsWithScriptsConfirm": "Этот файл содержит включенные пользовательские скрипты ({{count}}), которые могут выполнять код в YouTube. Продолжайте, только если доверяете этому файлу. Ваши текущие настройки, черный список, пользовательские стили и скрипты будут заменены.",
+    "importSettingsDone": "Импортировано: {{sections}}",
+    "exportSettings": "Экспортировать настройки",
+    "exportSettingsDescription": "Сохранить настройки, черный список, пользовательские стили и скрипты в виде JSON-файла",
+    "preferencesDistractionFree": "Отвлекающие элементы",
+    "groupYouTube": "YouTube",
+    "groupNouTube": "GoreeCloud YouTube Player",
+    "preferencesComments": "Комментарии",
+    "sidebar": "Боковая панель",
+    "preferencesYouTubeHint": "Параметры YouTube",
+    "preferencesNouTubeHint": "Параметры GoreeCloud YouTube Player",
+    "systemCaptionStyle": {
+      "label": "Использовать системный стиль субтитров",
+      "hint": "Применяет цвет, фон и размер текста из настроек Android к субтитрам YouTube.",
+      "openSystemSettings": "Системные настройки субтитров"
+    },
+    "showSleepTimerButtonInHeader": "Показывать кнопку таймера сна на панели инструментов",
+    "showLibraryButtonInHeader": "Показывать кнопку «Библиотека» на панели инструментов",
+    "showStarButtonInHeader": "Показывать кнопку «Избранное» на панели инструментов",
+    "mediaNotificationButtons": "Кнопки медиауведомления",
+    "showMediaNotificationPrevButton": "Показывать кнопку «Предыдущий»",
+    "showMediaNotificationNextButton": "Показывать кнопку «Следующий»",
+    "showMediaNotificationRewindButton": "Показывать кнопку перемотки назад",
+    "showMediaNotificationForwardButton": "Показывать кнопку перемотки вперед",
+    "showMediaNotificationSpeedButton": "Показывать кнопку скорости воспроизведения",
+    "showMediaNotificationCloseButton": "Показывать кнопку «Закрыть»",
+    "mediaNotificationButtonsHint": "Android отображает не более четырех из этих кнопок рядом с кнопкой воспроизведения в указанном здесь порядке. Включено: {{selected}}.",
+    "miniPlayerHint": "При выходе из видео оно продолжит воспроизводиться в углу страницы.",
+    "pictureInPicture": "Картинка в картинке",
+    "pictureInPictureHint": "Видео продолжит воспроизводиться в плавающем окне при выходе из приложения.",
+    "blockAds": {
+      "label": "Блокировать рекламу",
+      "hint": "Отключите, чтобы разрешить показ рекламы на YouTube и поддержать авторов."
+    },
+    "dynamicColor": {
+      "label": "Динамические цвета",
+      "hint": "Использовать системную цветовую палитру."
+    }
+  },
+  "sync": {
+    "label": "Синхронизация",
+    "hint": "Синхронизируйте закладки на телефонах и компьютерах с подпиской Premium.",
+    "currentPlan": "Текущий план",
+    "managePlan": "Управление планом",
+    "freePlan": "Бесплатно",
+    "deleteAccount": "Удалить аккаунт",
+    "buy": "Оформить подписку через App Store",
+    "restore": "Восстановить покупки",
+    "manageIos": "Управлять в App Store",
+    "purchaseTitle": "Привязать подписку",
+    "purchaseConfirm": "Эта подписка будет привязана к {{email}} и разблокирует синхронизацию везде, где вы войдете в этот аккаунт GoreeCloud YouTube Player.",
+    "priceLoading": "Загрузка цены из App Store...",
+    "purchasePending": "Покупка ожидает подтверждения. Синхронизация станет доступна после одобрения.",
+    "productUnavailable": "Продукт App Store пока недоступен.",
+    "noPurchaseToRestore": "Покупок GoreeCloud YouTube Player Sync для восстановления не найдено.",
+    "activeViaIos": "Активна через App Store",
+    "signOutSwitch": "Выйти и сменить аккаунт",
+    "expiresAt": "Обновляется или истекает: {{value}}",
+    "legalNotice": "Подписка продлевается автоматически, если ее не отменить. Оформляя подписку, вы принимаете Условия использования (EULA) и Политику конфиденциальности.",
+    "termsOfUse": "Условия использования (EULA)",
+    "privacyPolicy": "Политика конфиденциальности"
+  },
+  "feeds": {
+    "updates": "Обновления",
+    "manage": "Управление",
+    "sortLastVideo": "Последнее видео",
+    "sortFrequency": "Частота",
+    "lastVideoNewest": "Последнее видео: сначала новые",
+    "lastVideoOldest": "Последнее видео: сначала старые",
+    "frequencyHighest": "Частота: сначала частые",
+    "frequencyLowest": "Частота: сначала редкие",
+    "frequencyLabel": "Частота",
+    "lastVideoLabel": "Последнее видео",
+    "videosPerDay": "{{value}} видео в день",
+    "never": "Никогда",
+    "allFolders": "Все",
+    "newFolder": "+ Новая папка",
+    "editFeed": "Изменить ленту",
+    "manageEmpty": "Сохраненных лент пока нет.",
+    "manageNoResults": "Нет лент, соответствующих текущим фильтрам.",
+    "updatesEmpty": "Нет видео в ленте, соответствующих фильтру папки.",
+    "filterDropdownPlaceholder": "Фильтр папок и каналов",
+    "filterDropdownEmpty": "Нет подходящих папок или каналов.",
+    "emptyTitleNoChannels": "Нет избранных каналов",
+    "emptyBodyNoChannels": "Здесь будут появляться обновления от избранных каналов YouTube.",
+    "emptyTitleFolder": "Нет обновлений в папке {{folder}}",
+    "emptyTitleChannel": "Нет обновлений с канала {{channel}}",
+    "emptyBodyFiltered": "Сейчас здесь нет новых видео. Загляните позже или переключитесь на «Все».",
+    "emptyActionFetchNow": "Обновить сейчас",
+    "fetchToastSuccess": "Лента обновлена",
+    "fetchToastRunning": "Обновление уже выполняется",
+    "fetchToastNotFound": "Не удалось обновить этот канал. Лента вернула ошибку 404.",
+    "fetchToastError": "Не удалось обновить этот канал",
+    "emptyActionAllFolders": "Показать все",
+    "emptyTitleWaiting": "Ожидание обновлений ленты",
+    "emptyBodyWaiting": "Ваши каналы сохранены. Оставьте приложение открытым ненадолго или зайдите позже, и здесь появятся новые видео.",
+    "removeTitle": "Удалить {{title}}?",
+    "removeMessage": "Это удалит канал из библиотеки и очистит его видео в ленте."
+  },
+  "changelog": {
+    "label": "Журнал изменений",
+    "hint": "Последние релизы и исправления с GitHub.",
+    "loading": "Загрузка заметок о выпуске...",
+    "error": "Не удалось загрузить заметки о выпуске.",
+    "retry": "Повторить",
+    "empty": "Заметки о выпуске не найдены.",
+    "current": "Текущая",
+    "noNotes": "Для этой версии отсутствуют заметки о выпуске."
+  },
+  "sleepTimer": {
+    "label": "Таймер сна",
+    "hint": "Приостановить воспроизведение через заданное время или указанное количество минут.",
+    "activeHint": "Воспроизведение остановится после окончания таймера.",
+    "off": "Выкл",
+    "endsIn": "Осталось {{value}}",
+    "preset": "{{value}} мин",
+    "customPlaceholder": "Свои минуты",
+    "set": "Установить таймер",
+    "cancel": "Отменить таймер",
+    "replace": "Заменить",
+    "validation": {
+      "minutes": "Введите целое число минут от 1 до 1440"
+    },
+    "setToast": "Таймер сна установлен на {{value}} мин",
+    "cancelToast": "Таймер сна отменён",
+    "expiredToast": "Время таймера сна истекло"
+  },
+  "native": {
+    "format_bestQuality": "Лучшее качество",
+    "format_bestQualityDesc": "Видео до {{height}}p + аудио",
+    "format_1080pDesc": "Видео 1080p + аудио",
+    "format_720pDesc": "Видео 720p + аудио",
+    "format_audioOnly": "Только аудио",
+    "format_audio": "Аудио ({{ext}})",
+    "format_audioStreamDesc": "Лучший аудиопоток",
+    "format_audioMp3Desc": "Лучшее аудио с конвертацией в MP3",
+    "download_complete": "Загрузка завершена",
+    "download_failed": "Ошибка загрузки"
+  },
+  "update": {
+    "check": "Проверить обновления",
+    "checkHint": "Узнать, доступна ли новая версия",
+    "upToDate": "У вас установлена последняя версия",
+    "downloading": "Загрузка обновления v{{version}}…",
+    "error": "Не удалось проверить обновления",
+    "downloadedTitle": "Обновление готово",
+    "downloadedHint": "Версия {{version}} загружена. Перезапустить сейчас для установки?"
+  },
+  "bookmarks": {
+    "removed": "Закладка удалена",
+    "moved": "Перемещено в {{folder}}",
+    "movedToRoot": "Перемещено из папки"
+  },
+  "folders": {
+    "removed": "Папка {{name}} удалена"
+  },
+  "pageLoadError": {
+    "title": "Не удается загрузить эту страницу",
+    "description": "Проверьте подключение к сети и попробуйте снова."
+  },
+  "extension": {
+    "openOptions": "Черный список и пользовательские стили",
+    "reloadTabs": "Перезагрузить вкладки YouTube",
+    "applyHint": "Некоторые настройки вступят в силу только при следующей загрузке страницы.",
+    "userScriptsUnavailable": "Пользовательским скриптам требуется разрешение браузера. В Chrome откройте страницу сведений о расширении и разрешите использование скриптов.",
+    "feeds": "Ленты",
+    "library": "Библиотека",
+    "signIn": "Войти",
+    "signedOut": "Не выполнен вход",
+    "syncNow": "Синхронизировать сейчас",
+    "refreshFeeds": "Обновить ленты",
+    "manageFeeds": "Управление лентами",
+    "account": "Аккаунт и синхронизация",
+    "more": "Ещё",
+    "openExpanded": "Открыть в новой вкладке",
+    "openYouTube": "Открыть YouTube",
+    "openYouTubeMusic": "Открыть YouTube Music",
+    "saveCurrentPage": "Сохранить текущую страницу"
+  },
+  "history": {
+    "cleared": "История очищена"
+  }
+}

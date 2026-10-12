@@ -1,0 +1,57 @@
+import { View, TouchableOpacity } from 'react-native'
+import { NouText } from '../NouText'
+import { useEffect, useRef } from 'react'
+import { NouTubeView } from '@/modules/nou-tube-view'
+import { resolveUserAgent } from '@/lib/useragent'
+import { settings$ } from '@/states/settings'
+import { useValue } from '@legendapp/state/react'
+import { isIos, isWeb } from '@/lib/utils'
+
+export const EmbedVideoModal: React.FC<{
+  videoId: string
+  scriptOnStart: string
+  userScriptsOnStart?: string[]
+  onClose: () => void
+}> = ({
+  videoId,
+  scriptOnStart,
+  userScriptsOnStart,
+  onClose,
+}) => {
+  const customUserAgent = useValue(settings$.userAgent)
+  const userAgent = resolveUserAgent(
+    isIos ? 'ios' : isWeb ? window.electron.process.platform : 'android',
+    customUserAgent,
+  )
+  const url = `https://www.youtube.com/embed/${videoId}`
+  const ref = useRef<any>(null)
+  useEffect(() => {
+    ref.current?.loadUrl(url)
+  }, [ref, url])
+
+  const onLoad = () => {
+    ref.current?.executeJavaScript('NouTube.playDefaultAudio()')
+  }
+  const onMessage = async (e: { nativeEvent: { payload: string } }) => {}
+
+  return (
+    <View className="absolute inset-0">
+      <View className="flex-1 bg-zinc-100 dark:bg-zinc-800">
+        <NouTubeView
+          ref={ref}
+          style={{ flex: 1 }}
+          useragent={userAgent}
+          scriptOnStart={scriptOnStart}
+          userScriptsOnStart={userScriptsOnStart}
+          onLoad={onLoad}
+          onMessage={onMessage}
+        />
+        <View className="items-center my-4">
+          <TouchableOpacity onPress={onClose}>
+            <NouText className="rounded-full bg-zinc-200 px-6 py-2 text-center dark:bg-gray-700">Close</NouText>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
+  )
+}

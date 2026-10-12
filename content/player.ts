@@ -1,0 +1,601 @@
+import { retry, throttle } from 'es-toolkit'
+import { emit, log, isEmbedFrame, isYTMusic, nouPolicy, nouStorage, parseJson } from './utils'
+import { hideLiveChat, showLiveChatButton, showLiveChatReplayButton } from './livechat'
+import { originalLabels } from './audio'
+import { clearSkipSegments, getSkipSegments, isSponsorBlockEnabled, renderSkipSegments, Segment } from './sponsorblock'
+import { playbackRates } from '../lib/playback-rate'
+import { applyCaptionFontScale } from './captions'
+
+export let player: any
+let curVideoId = ''
+let skipSegments: { videoId: string; segments: Segment[] } = { videoId: '', segments: [] }
+let segmentsResizeBinded = false
+const fullscreenTitleId = '_nou_fullscreen_title'
+
+const keys = {
+  playing: 'nou:playing',
+  settings: 'nou:settings',
+}
+
+function getSettings() {
+  return parseJson(nouStorage.getItem(keys.settings), {}) as {
+    playbackRate?: number
+    playbackQuality?: string
+    sponsorBlock?: boolean
+  }
+}
+
+function getSavedPlaybackRate() {
+  const { playbackRate } = getSettings()
+  return typeof playbackRate == 'number' && Number.isFinite(playbackRate) ? playbackRate : 1
+}
+
+function getSavedPlaybackQuality() {
+  const { playbackQuality } = getSettings()
+  return typeof playbackQuality == 'string' ? playbackQuality : 'auto'
+}
+
+function getVideoElement(player: any) {
+  const video = document.querySelector('#movie_player video') || player?.querySelector?.('video') || document.querySelector('video')
+  return video instanceof HTMLVideoElement ? video : null
+}
+
+function renderFullscreenTitle(title: string) {
+  if (!window.isAndroid) {
+    return
+  }
+
+  const controls = document.querySelector('#player-control-overlay .player-controls-content')
+  if (!controls) {
+    return
+  }
+
+  // Newer YouTube has its own fullscreen title; css.ts unhides that one instead.
+  if (controls.querySelector('player-fullscreen-top-controls')) {
+    return
+  }
+
+  let titleElement = controls.querySelector<HTMLElement>(`#${fullscreenTitleId}`)
+  if (!titleElement) {
+    titleElement = document.createElement('div')
+    titleElement.id = fullscreenTitleId
+    controls.append(titleElement)
+  }
+  titleElement.textContent = title
+}
+
+function extendPlaybackRates(player: any) {
+  if (!player || player.__nouPlaybackRatesExtended) {
+    return
+  }
+
+  try {
+    const originalGetRates = player.getAvailablePlaybackRates?.bind(player)
+    const originalSetRate = player.setPlaybackRate?.bind(player)
+    if (!originalGetRates || !originalSetRate) {
+      return
+    }
+
+    player.getAvailablePlaybackRates = () => playbackRates
+    player.setPlaybackRate = (rate: number) => {
+      const video = getVideoElement(player)
+      if (video) {
+        video.playbackRate = rate
+      }
+
+      if (rate <= 2) {
+        originalSetRate(rate)
+      }
+
+      emit('playback-rate', { playbackRate: rate })
+    }
+    player.__nouPlaybackRatesExtended = true
+  } catch (e) {
+    log('failed to extend playback rates', e)
+  }
+}
+
+function applySavedPlaybackRate(player: any) {
+  const playbackRate = getSavedPlaybackRate()
+  try {
+    // No check against getAvailablePlaybackRates(): YouTube's own speed slider
+    // hands out off-list rates like 1.15, and the override above already falls
+    // back to the video element for anything the player itself won't take.
+    player.setPlaybackRate?.(playbackRate)
+  } catch (e) {
+    log('failed to apply playback rate', e)
+  }
+}
+
+function extendPlaybackQuality(player: any) {
+  if (!player || player.__nouPlaybackQualityExtended) {
+    return
+  }
+
+  try {
+    const originalSetQuality = player.setPlaybackQuality?.bind(player)
+    const originalSetQualityRange = player.setPlaybackQualityRange?.bind(player)
+
+    if (originalSetQuality) {
+      player.setPlaybackQuality = (quality: string) => {
+        originalSetQuality(quality)
+        emit('playback-quality', { playbackQuality: quality })
+      }
+    }
+
+    if (originalSetQualityRange) {
+      player.setPlaybackQualityRange = (suggested: string, accepted: string) => {
+        originalSetQualityRange(suggested, accepted)
+        emit('playback-quality', { playbackQuality: suggested })
+      }
+    }
+
+    player.__nouPlaybackQualityExtended = true
+  } catch (e) {
+    log('failed to extend playback quality', e)
+  }
+}
+
+function applySavedPlaybackQuality(player: any) {
+  const playbackQuality = getSavedPlaybackQuality()
+  try {
+    const availableQualities = player.getAvailableQualityLevels?.()
+    if (playbackQuality === 'auto') {
+      return
+    }
+    if (Array.isArray(availableQualities) && !availableQualities.includes(playbackQuality)) {
+      // Let player fall back natively
+    }
+    if (player.setPlaybackQualityRange) {
+      player.setPlaybackQualityRange(playbackQuality, playbackQuality)
+    } else if (player.setPlaybackQuality) {
+      player.setPlaybackQuality(playbackQuality)
+    }
+  } catch (e) {
+    log('failed to apply playback quality', e)
+  }
+}
+
+export function handleMutations(mutations: MutationRecord[]) {
+  for (const mutation of mutations) {
+    for (const node of mutation.addedNodes.values()) {
+      const el = node as any
+      if (el.id == 'movie_player') {
+        handleVideoPlayer(el)
+      }
+    }
+  }
+  // YouTube Music mounts the player deep inside <ytmusic-player>, so the added
+  // node is an ancestor and the id check above never sees it -- the player goes
+  // unbound for the whole session and nothing ever reaches the media
+  // notification. A document lookup finds it wherever it lands, and stays cheap:
+  // at most one indexed id query per batch, and only while no live player is
+  // bound. A player YouTube has swapped out stops being connected, which is what
+  // lets its replacement be picked up.
+  if (!player?.__nouPlayerBound || !player.isConnected) {
+    const found = document.querySelector('#movie_player')
+    if (found) {
+      handleVideoPlayer(found)
+    }
+  }
+}
+
+export function handleVideoPlayer(el: any) {
+  player = el
+  // YouTube re-inserts #movie_player on its own, and the mutation observer
+  // hands every insertion back here. Binding twice would double the listeners
+  // and, worse, start over with an empty title and duration that the branch
+  // below only refills when the video id changes -- overwriting a good history
+  // entry with blanks.
+  if (el.__nouPlayerBound) {
+    return
+  }
+  el.__nouPlayerBound = true
+  extendPlaybackRates(player)
+  extendPlaybackQuality(player)
+  // onApiChange fires when the player's modules (captions included) load, which
+  // is the earliest point setOption('captions', ...) is accepted.
+  el.addEventListener('onApiChange', () => applyCaptionFontScale(el))
+  applyCaptionFontScale(el)
+  let title = ''
+  let duration = 0
+
+  // Everything the save needs is read in one go, so a throttled call can never
+  // pair one video's position with another's url: the trailing call replays the
+  // snapshot it was given instead of re-reading the player as it is by then.
+  const getProgress = (currentTime: number) => {
+    const { videoDetails } = el.getPlayerResponse?.() || {}
+    const videoId = videoDetails?.videoId
+    const url = player.getVideoUrl?.() || ''
+    if (!videoId || !url) {
+      return undefined
+    }
+    return {
+      url,
+      videoId,
+      title: videoDetails.title || '',
+      author: videoDetails.author || '',
+      thumbnail: videoDetails.thumbnail?.thumbnails?.at(-1)?.url || '',
+      current: currentTime,
+      duration: Number(videoDetails.lengthSeconds) || 0,
+    }
+  }
+
+  const saveProgress = throttle((progress: NonNullable<ReturnType<typeof getProgress>>) => {
+    nouStorage.setItem(keys.playing, JSON.stringify({ url: progress.url, current: progress.current }))
+    emit('progress', progress)
+  }, 5000)
+  // One source for the play state in both notify paths below. YouTube reports
+  // state 3 while it buffers, which the element still calls playing, so the two
+  // disagree across a transition -- and a progress tick landing on the other
+  // answer would undo the state a button press had just sent.
+  const isPlaying = () => {
+    const video = getVideoElement(player)
+    return video ? !video.paused : el.getPlayerState() == 1
+  }
+  // Android feeds its media session through NouTubeI, and the Discord presence
+  // rides along there. Desktop has no such channel, so it gets a message.
+  const emitPlayback = throttle(() => {
+    if (window.NouTubeI) {
+      return
+    }
+    const progress = getProgress(el.getCurrentTime?.() ?? 0)
+    if (progress) {
+      emit('playback', {
+        ...progress,
+        playing: isPlaying(),
+        rate: getVideoElement(player)?.playbackRate ?? 1,
+      })
+    }
+  }, 5000)
+  const notifyProgress = throttle(() => {
+    if (!el.getCurrentTime) {
+      hideLiveChat()
+      return
+    }
+    const currentTime = el.getCurrentTime()
+    window.NouTubeI?.notifyProgress(isPlaying(), currentTime)
+    emitPlayback()
+    const progress = getProgress(currentTime)
+    if (progress) {
+      saveProgress(progress)
+    }
+    if (isSponsorBlockEnabled() && curVideoId == skipSegments.videoId && skipSegments.segments.length) {
+      renderSkipSegments(curVideoId, skipSegments.segments, duration || el.getDuration?.() || 0)
+      for (const segment of skipSegments.segments) {
+        const [start, end] = segment.segment
+        if (currentTime > start && currentTime < end) {
+          player.seekTo(end)
+          return
+        }
+      }
+    } else {
+      clearSkipSegments()
+    }
+  }, 1000)
+  // The throttle above keeps the per-second progress work in check, but the
+  // media controls read the play state off the same call: a button press that
+  // lands while the last tick is still inside the throttle window would be
+  // answered from a state up to a second old, and the lock screen and the
+  // media notification then show what the video is not doing. The state itself
+  // is cheap, so play and pause send it straight out.
+  const notifyPlayState = () => {
+    window.NouTubeI?.notifyProgress(isPlaying(), el.getCurrentTime?.() ?? 0)
+    emitPlayback()
+    emitPlayback.flush()
+  }
+
+  // Entering fullscreen or rotating resizes the progress bar, and the redraw
+  // above only rides on playback ticks, so a paused video would keep segments
+  // drawn at the old width.
+  const redrawSegments = () => {
+    if (isSponsorBlockEnabled() && curVideoId == skipSegments.videoId && skipSegments.segments.length) {
+      renderSkipSegments(curVideoId, skipSegments.segments, duration || el.getDuration?.() || 0)
+    }
+  }
+  if (!segmentsResizeBinded) {
+    segmentsResizeBinded = true
+    window.addEventListener('resize', redrawSegments)
+    document.addEventListener('fullscreenchange', () => {
+      redrawSegments()
+      // The fullscreen transition animates, so catch the settled layout too.
+      setTimeout(redrawSegments, 400)
+    })
+  }
+
+  let progressBinded = false
+  const onStateChange = async (state: number) => {
+    // The native mini player draws its own play/pause button, so it needs the
+    // state transitions -- notifyProgress is throttled and too coarse for a
+    // button the user just tapped.
+    emit('play-state', { playing: state == 1 })
+    const { playabilityStatus, videoDetails } = el.getPlayerResponse() || {}
+    if (!videoDetails) {
+      hideLiveChat()
+      return
+    }
+    if (state == 0 && !isYTMusic) {
+      nouStorage.removeItem(keys.playing)
+      emit('playback-end')
+    }
+    if (document.location.host == 'm.youtube.com' && document.location.pathname == '/') {
+      el.pauseVideo()
+      return
+    }
+    if (!progressBinded) {
+      const video = getVideoElement(player)
+      if (video) {
+        video.addEventListener('timeupdate', notifyProgress)
+        ;['play', 'pause'].forEach((evt) => {
+          video.addEventListener(evt, () => {
+            notifyPlayState()
+            notifyProgress()
+          })
+        })
+        video.addEventListener('ratechange', () => {
+          emit('playback-rate', { playbackRate: video.playbackRate })
+          emitPlayback()
+          emitPlayback.flush()
+        })
+        progressBinded = true
+      }
+    }
+
+    const { title: _title, author, thumbnail, lengthSeconds, videoId } = videoDetails
+    renderFullscreenTitle(_title)
+    if (curVideoId != videoId) {
+      // The previous video's trailing save is still pending; letting it land
+      // would put that video back at the top of the history, after this one.
+      saveProgress.cancel()
+      // A site mutes its embed on purpose, typically so that it may autoplay,
+      // and the browser pauses a video that is unmuted without a user gesture.
+      if (!isEmbedFrame) {
+        player.unMute()
+      }
+      const thumb = thumbnail.thumbnails.at(-1)
+      duration = +lengthSeconds
+      title = _title
+      window.NouTubeI?.notify(title, author, duration, thumb?.url || '')
+      curVideoId = videoId
+
+      if (window.NouTubeI) {
+        renderPlayOriginalAudioBtn()
+
+        hideLiveChat()
+        if (playabilityStatus?.liveStreamability) {
+          showLiveChatButton(curVideoId)
+        } else if (videoDetails.isLiveContent) {
+          void showLiveChatReplayButton(curVideoId)
+        }
+      }
+
+      clearSkipSegments()
+      skipSegments = { videoId: '', segments: [] }
+      if (isSponsorBlockEnabled()) {
+        const nextSkipSegments = await getSkipSegments(videoId)
+        // A previous request may finish after the user has navigated to a new
+        // video. Never let that stale response replace or paint the new video.
+        if (curVideoId !== videoId) {
+          return
+        }
+        skipSegments = nextSkipSegments
+        renderSkipSegments(videoId, nextSkipSegments.segments, duration)
+      }
+
+      applySavedPlaybackRate(player)
+      applySavedPlaybackQuality(player)
+    }
+  }
+  el.addEventListener('onStateChange', onStateChange)
+
+  // Binding can land mid-playback: YouTube Music mounts its player long after
+  // the page, so the state change that would have set all this up has already
+  // fired and the next one is a track away. Replaying the live state gets the
+  // notification, the progress ticks and the saved position going now. Only the
+  // states that mean a video is loaded -- replaying 'ended' would clear the
+  // resume position and report a playback that is not happening.
+  const liveState = el.getPlayerState?.()
+  if (liveState === 1 || liveState === 2 || liveState === 3) {
+    void onStateChange(liveState)
+  }
+}
+
+// The native shell force-rotates fullscreen to landscape, but only when the
+// user asked for fullscreen explicitly: tapping the player's fullscreen button
+// or rotating the device. YouTube's own gestures (pulling the comment sheet
+// down on /watch) also enter fullscreen, and rotating the phone for those is a
+// surprise, so mark the explicit path and let onShowCustomView read the mark.
+document.addEventListener(
+  'click',
+  (event) => {
+    // .fullscreen-icon is the mobile player's button; .ytp-fullscreen-button
+    // the one the desktop and embed players use.
+    const target = event.target as Element | null
+    if (target?.closest?.('.fullscreen-icon, .ytp-fullscreen-button')) {
+      window.NouTubeFsIntent = Date.now()
+    }
+  },
+  true,
+)
+
+screen.orientation.addEventListener('change', (event) => {
+  if (window.NouTubePip || document.location.pathname != '/watch' || document.visibilityState != 'visible') {
+    return
+  }
+
+  const target = event.target as any
+  const type = target.type
+  if (type.includes('landscape')) {
+    if (!document.fullscreenElement && screen.availWidth < 1000) {
+      ;(document.querySelector('#player-control-container .fullscreen-icon') as HTMLButtonElement)?.click()
+    }
+  } else {
+    if (document.fullscreenElement) {
+      document.exitFullscreen()
+    }
+  }
+})
+
+export async function playDefaultAudio() {
+  await retry(
+    () => {
+      if (!player) {
+        throw 'player not ready'
+      }
+      return player
+    },
+    { retries: 30, delay: 100 },
+  )
+  player?.playVideo()
+  const audioTracks: any[] = await retry(
+    () => {
+      const tracks = player.getAvailableAudioTracks()
+      if (!tracks.length) {
+        throw 'tracks not ready'
+      }
+      return tracks
+    },
+    { retries: 30, delay: 100 },
+  )
+  let options = ''
+  let selected
+  let i = 0
+  for (const track of audioTracks) {
+    for (let v of Object.values(track)) {
+      const value = v as any
+      if (value && typeof value == 'object' && 'isDefault' in value && value.name) {
+        if (originalLabels.some((x) => value.name.includes(x))) {
+          selected = i.toString()
+          player.setAudioTrack(track)
+        }
+        options += `<option value="${i}">${value.name}</option>`
+      }
+    }
+    i++
+  }
+
+  let container = document.querySelector('div#_nou_audio_picker')
+  if (!container) {
+    container = document.createElement('div')
+    container.id = '_nou_audio_picker'
+    document.body.append(container)
+  }
+  container.innerHTML = nouPolicy.createHTML(/* HTML */ `
+    <select>
+      ${options}
+    </select>
+  `)
+  const select = container.querySelector('select')
+  if (select) {
+    if (selected) {
+      select.value = selected
+    }
+    select.onchange = (e) => {
+      const i = (e.target as HTMLSelectElement).value
+      if (i != null) {
+        player.setAudioTrack(audioTracks[+i])
+      }
+    }
+  }
+}
+
+async function renderPlayOriginalAudioBtn() {
+  if (document.location.pathname != '/watch' || isYTMusic) {
+    return
+  }
+
+  const badgeRenderer = await retry(
+    async () => {
+      const badgeRenderer = document.querySelector('ytm-slim-video-information-renderer ytm-badge-supported-renderer')
+      if (!badgeRenderer) {
+        throw 'badge not ready'
+      }
+      return badgeRenderer
+    },
+    { retries: 30, delay: 100 },
+  )
+
+  if (!badgeRenderer) {
+    return
+  }
+
+  const container = document.createElement('div')
+  container.id = '_nou_audio_btn'
+  container.innerHTML = nouPolicy.createHTML(/* HTML */ `
+    Play original audio 🦦
+  `)
+  container.onclick = (e) => {
+    e.stopPropagation()
+    player.pauseVideo()
+    emit('embed', curVideoId)
+  }
+
+  badgeRenderer.append(container)
+}
+
+const MIN_RESUME_SECONDS = 5
+
+function getVideoIdOf(url: string) {
+  try {
+    return new URL(url, document.location.href).searchParams.get('v') || ''
+  } catch {
+    return ''
+  }
+}
+
+function hasTimeParam(url: string) {
+  try {
+    return new URL(url, document.location.href).searchParams.has('t')
+  } catch {
+    return false
+  }
+}
+
+async function seekToSavedPosition(current: number) {
+  try {
+    const el: any = await retry(
+      async () => {
+        const el = document.getElementById('movie_player') as any
+        if (!el?.seekTo) {
+          throw 'player not ready'
+        }
+        return el
+      },
+      { retries: 30, delay: 100 },
+    )
+    el?.seekTo(current)
+  } catch (e) {
+    log('failed to seek to the saved position', e)
+  }
+}
+
+export function restoreLastPlaying() {
+  const value = parseJson(nouStorage.getItem(keys.playing), {}) as { url?: string; current?: number }
+  if (!value.url) {
+    return
+  }
+  const current = Number(value.current) || 0
+  const savedVideoId = getVideoIdOf(value.url)
+
+  // The app can already open on the saved video with the position in the url.
+  // Navigating again would reload the page and restart it from 0.
+  if (savedVideoId && savedVideoId == getVideoIdOf(document.location.href)) {
+    if (current >= MIN_RESUME_SECONDS && !hasTimeParam(document.location.href)) {
+      void seekToSavedPosition(current)
+    }
+    return
+  }
+
+  document.location.href =
+    current >= MIN_RESUME_SECONDS && !hasTimeParam(value.url) ? withTime(value.url, current) : value.url
+}
+
+function withTime(url: string, current: number) {
+  try {
+    const next = new URL(url, document.location.href)
+    next.searchParams.set('t', `${Math.floor(current)}s`)
+    return next.href
+  } catch {
+    return url
+  }
+}
