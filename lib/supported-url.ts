@@ -1,16 +1,33 @@
 const SUPPORTED_HOSTS = new Set(['youtube.com', 'www.youtube.com', 'm.youtube.com', 'music.youtube.com', 'youtu.be'])
+const LEGACY_LINK_PREFIX = 'noutube://'
 
+/** Only convert the exact legacy link prefix, never a substring of an unrelated URL. */
+export function normalizeSupportedUrl(value: string) {
+  return value.startsWith(LEGACY_LINK_PREFIX)
+    ? `https://${value.slice(LEGACY_LINK_PREFIX.length)}`
+    : value
+}
+
+/** Untrusted links may originate in the clipboard, OS share sheets or desktop IPC. */
 export function isSupportedUrl(value: string) {
+  if (!value || /[\u0000-\u001f\u007f]/.test(value)) {
+    return false
+  }
+  if (value.startsWith('noutube:') && !value.startsWith(LEGACY_LINK_PREFIX)) {
+    return false
+  }
   try {
-    const url = new URL(value.replace('noutube://', 'https://'))
-    return ['http:', 'https:'].includes(url.protocol) && SUPPORTED_HOSTS.has(url.host)
+    const url = new URL(normalizeSupportedUrl(value))
+    return (
+      (url.protocol === 'http:' || url.protocol === 'https:') &&
+      SUPPORTED_HOSTS.has(url.hostname) &&
+      !url.username &&
+      !url.password &&
+      !url.port
+    )
   } catch {
     return false
   }
-}
-
-export function normalizeSupportedUrl(value: string) {
-  return value.replace('noutube://', 'https://')
 }
 
 /* youtu.be only redirects to the watch page. Nothing that decides where a link
