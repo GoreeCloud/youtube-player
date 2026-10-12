@@ -2,7 +2,7 @@ import { ui$, updateUrl } from '@/states/ui'
 import { onReceiveAuthUrl } from './supabase/auth'
 import { settings$ } from '@/states/settings'
 import { debounce } from 'es-toolkit'
-import { expandShortUrl, isSupportedUrl, normalizeSupportedUrl } from './supported-url'
+import { expandShortUrl, getSupportedVideoId, isSupportedUrl, normalizeSupportedUrl } from './supported-url'
 import { removeTrackingParams } from './tracking-url'
 
 export { getPageType } from './page-type'
@@ -21,11 +21,7 @@ export function getVideoThumbnail(id: string) {
 
 /* https://www.youtube.com/watch?v=<id> */
 export function getVideoId(url: string) {
-  try {
-    return new URL(url).searchParams.get('v')
-  } catch {
-    return ''
-  }
+  return getSupportedVideoId(url) ?? ''
 }
 
 export function getThumbnail(url: string) {
