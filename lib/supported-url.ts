@@ -30,6 +30,30 @@ export function isSupportedUrl(value: string) {
   }
 }
 
+/**
+ * Resolve video IDs across regular watch pages, Shorts, live streams,
+ * YouTube embed pages, and youtu.be shares without trusting a lookalike host.
+ */
+export function getSupportedVideoId(value: string): string | undefined {
+  if (!isSupportedUrl(value)) return undefined
+  const url = new URL(normalizeSupportedUrl(value))
+  const segments = url.pathname.split('/').filter(Boolean)
+  let id: string | null | undefined
+
+  if (url.hostname === 'youtu.be') {
+    id = segments.length === 1 ? segments[0] : undefined
+  } else if (segments.length === 1 && segments[0] === 'watch') {
+    id = url.searchParams.get('v')
+  } else if (
+    segments.length === 2 &&
+    ['shorts', 'live', 'embed'].includes(segments[0])
+  ) {
+    id = segments[1]
+  }
+
+  return id && /^[A-Za-z0-9_-]{1,64}$/.test(id) ? id : undefined
+}
+
 /** Find the first trusted shared link among arbitrary OS process arguments. */
 export function findSupportedLaunchUrl(args: readonly string[]): string | undefined {
   return args.find(isSupportedUrl)

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { isSupportedUrl, isSafeExternalUrl, findSupportedLaunchUrl, normalizeSupportedUrl } from '../../lib/supported-url.ts'
+import { isSupportedUrl, isSafeExternalUrl, findSupportedLaunchUrl, getSupportedVideoId, normalizeSupportedUrl } from '../../lib/supported-url.ts'
 
 test('allows approved YouTube hosts with HTTPS or legacy links', () => {
   for (const input of [
@@ -75,4 +75,37 @@ test('OS argv selects the first validated YouTube link, never a legacy auth toke
     findSupportedLaunchUrl(['--launch', 'https://music.youtube.com/watch?v=first', 'noutube://youtu.be/second']),
     'https://music.youtube.com/watch?v=first',
   )
+})
+
+
+test('extracts IDs for watch pages, Shorts, live links, embeds and short shares', () => {
+  const cases = [
+    ['https://www.youtube.com/watch?v=ABCDEFGHI01', 'ABCDEFGHI01'],
+    ['https://music.youtube.com/watch?v=ABC_def-12&list=PL123', 'ABC_def-12'],
+    ['https://m.youtube.com/shorts/ABCDEFGHI01', 'ABCDEFGHI01'],
+    ['https://youtube.com/live/ABC_def-12?feature=share', 'ABC_def-12'],
+    ['https://www.youtube.com/embed/ABCDEFGHI01?start=120', 'ABCDEFGHI01'],
+    ['https://youtu.be/ABC_def-12?t=45', 'ABC_def-12'],
+    ['noutube://youtu.be/ABCDEFGHI01?t=30', 'ABCDEFGHI01'],
+  ]
+  for (const [url, id] of cases) {
+    assert.equal(getSupportedVideoId(url), id, url)
+  }
+})
+
+test('never extracts thumbnails from spoofed hosts, credentials, or invalid IDs', () => {
+  for (const url of [
+    '',
+    'https://youtube.com.evil.example/watch?v=ABCDEFGHI01',
+    'https://user@www.youtube.com/watch?v=ABCDEFGHI01',
+    'https://www.youtube.com:444/watch?v=ABCDEFGHI01',
+    'https://www.youtube.com/watch?v=has%20spaces',
+    'https://www.youtube.com/shorts/a/b',
+    'https://www.youtube.com/live/',
+    'https://youtu.be/ABC_def-12/other',
+    'noutube:auth?code=token',
+    'javascript:https://www.youtube.com/watch?v=ABCDEFGHI01',
+  ]) {
+    assert.equal(getSupportedVideoId(url), undefined, url)
+  }
 })
