@@ -7,7 +7,7 @@ import { isSupportedUrl } from '@/lib/supported-url'
 const pendingDeeplinks: string[] = []
 
 function findLaunchUrl(args: string[]): string | undefined {
-  return args.find((arg) => arg.startsWith('noutube:') || isSupportedUrl(arg))
+  return args.find((arg) => isSupportedUrl(arg))
 }
 
 function handleLaunchUrl(url: string): void {
@@ -26,10 +26,10 @@ export function consumePendingDeeplinks(): string[] {
 export function bindDeeplink(): void {
   if (process.defaultApp) {
     if (process.argv.length >= 2) {
-      app.setAsDefaultProtocolClient('noutube', process.execPath, [path.resolve(process.argv[1])])
+      app.setAsDefaultProtocolClient('goreecloud-youtube-player', process.execPath, [path.resolve(process.argv[1])])
     }
   } else {
-    app.setAsDefaultProtocolClient('noutube')
+    app.setAsDefaultProtocolClient('goreecloud-youtube-player')
   }
 
   if (!app.requestSingleInstanceLock()) {

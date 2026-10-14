@@ -1,16 +1,27 @@
 const SUPPORTED_HOSTS = new Set(['youtube.com', 'www.youtube.com', 'm.youtube.com', 'music.youtube.com', 'youtu.be'])
+const APP_LINK_SCHEME = /^(?:noutube|goreecloud-youtube-player):\/\//i
 
-export function isSupportedUrl(value: string) {
+// Translate only a scheme at the start. Arbitrary or malformed custom links
+// must never bypass the same YouTube-origin validation as normal HTTPS links.
+function parseSupportedUrl(value: string): URL | null {
   try {
-    const url = new URL(value.replace('noutube://', 'https://'))
-    return ['http:', 'https:'].includes(url.protocol) && SUPPORTED_HOSTS.has(url.host)
+    const url = new URL(value.replace(APP_LINK_SCHEME, 'https://'))
+    if (url.protocol !== 'https:' || !SUPPORTED_HOSTS.has(url.hostname) ||
+        url.port || url.username || url.password) {
+      return null
+    }
+    return url
   } catch {
-    return false
+    return null
   }
 }
 
+export function isSupportedUrl(value: string) {
+  return parseSupportedUrl(value) !== null
+}
+
 export function normalizeSupportedUrl(value: string) {
-  return value.replace('noutube://', 'https://')
+  return parseSupportedUrl(value)?.href ?? ''
 }
 
 /* youtu.be only redirects to the watch page. Nothing that decides where a link
