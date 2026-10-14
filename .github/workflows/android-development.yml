@@ -42,10 +42,12 @@ jobs:
         with:
           distribution: temurin
           java-version: "17"
-      - name: Install Android SDK command line tools
-        uses: android-actions/setup-android@v3
-      - name: Install Android API 36 SDK
-        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+      - name: Use hosted runner's Android SDK and install Android 36
+        run: |
+          : "Using pre-installed Android SDK; the deprecated SDK 'tools' package is not required."
+          test -n "$ANDROID_HOME"
+          command -v sdkmanager
+          sdkmanager --install "platforms;android-36" "build-tools;36.0.0"
       - name: Set up locked Bun runtime
         uses: oven-sh/setup-bun@v2
         with:
