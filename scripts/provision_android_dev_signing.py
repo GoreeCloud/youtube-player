@@ -182,10 +182,15 @@ def main(argv=None):
     mode.add_argument("--verify-recovery", action="store_true")
     parser.add_argument("--primary", type=Path, required=True)
     parser.add_argument("--encrypted-backup", type=Path, required=True)
+    parser.add_argument("--expected-usb-uuid", required=True)
     parser.add_argument("--alias", default=ALIAS)
     args = parser.parse_args(argv)
     if not re.fullmatch(r"[a-z][a-z0-9-]{3,64}", args.alias):
         raise ValueError("Invalid signing key alias")
+    # Authenticate the mounted USB and GoreeCloud root before reading secrets.
+    execute(sys.executable, str(Path(__file__).with_name("verify_usb_backup_destination.py")),
+            "--backup-directory", str(args.encrypted_backup.expanduser().absolute().parent),
+            "--expected-uuid", args.expected_usb_uuid)
     backup_password = require_env()
     if args.create:
         result = create_custody(args.primary, args.encrypted_backup,

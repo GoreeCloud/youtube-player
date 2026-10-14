@@ -32,12 +32,16 @@ the environment values securely (paths below are placeholders):
 ```sh
 python3 scripts/provision_android_dev_signing.py --create \
   --primary /home/OWNER/.local/share/goreecloud/secure-signing/development.p12 \
-  --encrypted-backup /media/OWNER/BACKUP-DRIVE/GoreeCloud/development.p12.gpg
+  --encrypted-backup /media/OWNER/BACKUP-DRIVE/GoreeCloud/Backups/Signing/youtube-player/development.p12.gpg \
+  --expected-usb-uuid EXPECTED_VOLUME_UUID
 
 python3 scripts/provision_android_dev_signing.py --verify-recovery \
   --primary /home/OWNER/.local/share/goreecloud/secure-signing/development.p12 \
-  --encrypted-backup /media/OWNER/BACKUP-DRIVE/GoreeCloud/development.p12.gpg
+  --encrypted-backup /media/OWNER/BACKUP-DRIVE/GoreeCloud/Backups/Signing/youtube-player/development.p12.gpg \
+  --expected-usb-uuid EXPECTED_VOLUME_UUID
 ```
+
+Before either command can access the credentials, the read-only USB preflight verifies that the mounted filesystem UUID is the expected one and that the backup directory is exactly `<USB mount>/GoreeCloud/Backups/Signing/youtube-player/`. Discover the UUID locally with `lsblk -o NAME,UUID,LABEL,MOUNTPOINTS`, and recheck it after any remount. An unmounted path, wrong disk, symlink, wrong directory, or read-only filesystem fails closed. The UUID is an identifier, not a password; never hardcode a particular owner's device UUID in the public repository.
 
 The create operation generates a fresh RSA-3072 PKCS12 key with `keytool`,
 encrypts the backup with `gpg`, then independently **decrypts the backup in
