@@ -74,7 +74,8 @@ class DevelopmentSigningGate(unittest.TestCase):
             digest = hashlib.sha256(b"test").hexdigest()
             args = ["--input", str(apk), "--output", str(output),
                     "--keystore", str(keystore), "--source-sha", "a" * 40,
-                    "--unsigned-sha256", digest, "--expected-cert-sha256", "b" * 64,
+                    "--unsigned-sha256", digest, "--provenance", str(Path(temp) / "provenance.txt"),
+                    "--expected-cert-sha256", "b" * 64,
                     "--first-issue"]
             with patch.dict("os.environ", {}, clear=True):
                 with self.assertRaisesRegex(ValueError, "variable missing"):
