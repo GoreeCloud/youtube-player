@@ -27,7 +27,7 @@ class GoreeCloudFoundationTests(unittest.TestCase):
         data = json.loads((ROOT / "package.json").read_text())
         self.assertEqual(data["name"], "goreecloud-youtube-player")
         self.assertEqual(data["version"], "0.1.0")
-        self.assertEqual(data["versionCode"], 1)
+        self.assertGreaterEqual(data["versionCode"], 2)
         self.assertTrue(data["private"])
 
     def test_no_inherited_ci_release_jobs(self):

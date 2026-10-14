@@ -71,7 +71,7 @@ jobs:
       - name: Compile both Android development flavors
         working-directory: android
         run: |
-          ./gradlew :app:assembleFossDebug :app:assembleFullDebug --no-daemon --stacktrace --max-workers=2
+          ./gradlew :app:assembleFossDebug :app:assembleFullDebug :app:assembleFossDevelopment --no-daemon --stacktrace --max-workers=2
       - name: Verify device ABI output files
         run: |
           python3 - <<'PY'
@@ -81,17 +81,27 @@ jobs:
           assert any('full' in str(p).lower() for p in outputs), outputs
           print(f"Verified {len(outputs)} ephemeral Android debug APKs.")
           PY
+      - name: Validate independent unsigned Development arm64 APK
+        run: |
+          apk="android/app/build/outputs/apk/foss/development/app-foss-arm64-v8a-development-unsigned.apk"
+          test -f "$apk"
+          "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$apk" | grep -E "^package: name='com.goreecloud.youtubeplayer.dev' versionCode='204' versionName='0.1.0-dev'"
+          if "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify "$apk" >/dev/null 2>&1; then
+            echo "::error::Development APK unexpectedly signed; fail closed"
+            exit 1
+          fi
+          echo "Independent Development APK generated without a signing identity"
       - name: Verify bounded QA APKs and record checksums
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.retain_qa_apks == true }}
         run: |
           mkdir -p qa-evidence
           printf 'source_sha=%s\nrun_id=%s\nephemeral_debug_only=true\n' \
             "$GITHUB_SHA" "$GITHUB_RUN_ID" > qa-evidence/build.txt
-          find android/app/build/outputs/apk -type f -name '*.apk' -print0 | sort -z | \
+          find android/app/build/outputs/apk -type f -name '*debug.apk' -print0 | sort -z | \
             xargs -0 sha256sum >> qa-evidence/build.txt
           while IFS= read -r -d '' apk; do
             "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose "$apk"
-          done < <(find android/app/build/outputs/apk -type f -name '*.apk' -print0)
+          done < <(find android/app/build/outputs/apk -type f -name '*debug.apk' -print0)
       - name: Retain bounded QA APKs for 1 day
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.retain_qa_apks == true }}
         uses: actions/upload-artifact@v4

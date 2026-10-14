@@ -1,0 +1,70 @@
+name: Android unsigned Development candidate
+
+on:
+  workflow_dispatch:
+    inputs:
+      stage_unsigned_candidate:
+        description: "Explicitly stage a NON-INSTALLABLE unsigned Development APK for owner-side signing"
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  unsigned-development:
+    if: github.ref == 'refs/heads/main' && inputs.stage_unsigned_candidate == true
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      CI: "1"
+      EXPO_NO_TELEMETRY: "1"
+      EXPO_NO_GIT_STATUS: "1"
+      GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: "platform-tools"
+      - run: sdkmanager --install "platforms;android-36" "build-tools;36.0.0"
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.3"
+      - run: bun install --frozen-lockfile --ignore-scripts
+      - run: bun run bundle:es
+      - run: bunx expo prebuild --platform android --clean --no-install
+      - run: python3 -B scripts/verify-android-prebuild.py
+      - run: chmod +x android/gradlew
+      - name: Build unsigned, non-debug FOSS Development APK
+        working-directory: android
+        run: ./gradlew :app:assembleFossDevelopment --no-daemon --stacktrace --max-workers=2
+      - name: Check isolated identity, version and unsigned state
+        run: |
+          set -euo pipefail
+          apk="android/app/build/outputs/apk/foss/development/app-foss-arm64-v8a-development-unsigned.apk"
+          test -f "$apk"
+          "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$apk" | grep -E "^package: name='com.goreecloud.youtubeplayer.dev' versionCode='204' versionName='0.1.0-dev'"
+          if "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify "$apk" >/dev/null 2>&1; then
+            echo "::error::Unsigned Development candidate contains a signature"
+            exit 1
+          fi
+          mkdir -p unsigned-candidate
+          cp "$apk" unsigned-candidate/
+          printf 'source_sha=%s\nrun_id=%s\nsigning=NONE\napplication_id=com.goreecloud.youtubeplayer.dev\nversion_code=204\n' "$GITHUB_SHA" "$GITHUB_RUN_ID" > unsigned-candidate/provenance.txt
+          (cd unsigned-candidate && sha256sum *.apk >> provenance.txt)
+      - name: Retain unsigned candidate for 1 day
+        uses: actions/upload-artifact@v4
+        with:
+          name: unsigned-development-${{ github.sha }}
+          path: unsigned-candidate/
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 0
+
+# Never uses owner signing keys, installs APKs, or distributes signed builds.
+# The artifact is unsigned and non-installable until independently signed.
