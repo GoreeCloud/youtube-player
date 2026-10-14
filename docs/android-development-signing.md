@@ -27,7 +27,7 @@ after one day. It does not use or transmit signing secrets.
 The owner-controlled `scripts/sign_android_development.py` signs on a trusted
 device **outside GitHub Actions** and refuses to sign unless:
 
-1. The source revision, artifact SHA-256 and `.dev` package identity match.
+1. The source revision, unsigned APK SHA-256, `.dev` package identity and versionCode match `provenance.txt`. The signer also requires an authenticated `GoreeCloud` GitHub CLI account, verifies the recorded GitHub Actions run succeeded from `main` using the approved manual workflow, and downloads the original **unexpired** artifact to compare both APK bytes and provenance before signing. A locally edited provenance file alone is not trusted evidence.
 2. The keystore exists **outside Git**, is owner-only readable (0600), and the
    expected signing certificate SHA-256 is pinned.
 3. Signing credentials are supplied through protected environment variables
