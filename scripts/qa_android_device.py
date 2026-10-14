@@ -47,6 +47,18 @@ def authorized_device(requested):
     return devices[0]
 
 
+def already_installed(serial):
+    try:
+        return bool(run("adb", "-s", serial, "shell", "pm", "path", PACKAGE))
+    except subprocess.CalledProcessError as exc:
+        # Android's package manager can return exit 1 with no output when the
+        # package is absent. Device-offline, permission and transport errors
+        # contain diagnostic output and must remain hard failures.
+        if exc.returncode == 1 and not (exc.stdout or "").strip() and not (exc.stderr or "").strip():
+            return False
+        raise
+
+
 def inspect(apk, serial):
     if not eligible_apk(apk):
         raise RuntimeError("Only existing FOSS/Full arm64-v8a debug APKs are eligible")
@@ -58,7 +70,7 @@ def inspect(apk, serial):
     sdk = int(run("adb", "-s", serial, "shell", "getprop", "ro.build.version.sdk"))
     if "arm64-v8a" not in abi or sdk < 23:
         raise RuntimeError("Unsupported Android target architecture or API level")
-    if run("adb", "-s", serial, "shell", "pm", "path", PACKAGE):
+    if already_installed(serial):
         raise RuntimeError("Package already installed; no upgrades, replacement, or data changes allowed")
     digest = hashlib.sha256(apk.read_bytes()).hexdigest()
     return {"package": PACKAGE, "apk_name": apk.name, "sha256": digest,
