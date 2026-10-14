@@ -53,3 +53,16 @@ Preserve imported behavior as a reference; replace one subsystem at a time, add 
 - GoreeCloud Identity/Sync/Privacy Shield/Wardveil interfaces, encrypted data/credential migration and external security review.
 - Approved Development key management, signed APK in GoreeCloud Drive, release channel, licensed-source disclosures and actual deployment.
 - Desktop native package builds and browser extension signing/distribution.
+
+## Desktop Flatpak metadata identity
+
+The legacy local Flatpak manifest and AppStream/desktop entry names have been
+replaced with the independent development identity
+\`com.goreecloud.youtubeplayer.Dev\`. Previously inherited NouTube release
+history and screenshot URLs have deliberately been excluded: neither describes
+a verified GoreeCloud build. The wrapper points at the GoreeCloud executable,
+with the original NouTube provenance retained in \`UPSTREAM.md\`.
+
+This is source-metadata validation only; the pinned Flatpak runtime, Electron
+archives, packaging, installation and desktop runtime have not been certified.
+No Flatpak production release or distribution is authorized by this change.
