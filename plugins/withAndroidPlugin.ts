@@ -206,11 +206,28 @@ android {
     }`,
       )
       .replace('zh-Hans', 'b+zh+Hans')
+      // A separately installable, NON-debug-signed Development variant.
+      // Gradle generates the unsigned APK; only the owner-controlled manual
+      // signing workflow may sign it with a persistent protected identity.
+      // Keep QA Debug and Development packages separate to avoid the unsafe
+      // signature migration of an already installed ephemeral-debug APK.
+      .replace(
+        /    buildTypes \{\s*debug \{/,
+        `    buildTypes {
+        development {
+            initWith release
+            matchingFallbacks = ['release']
+            applicationIdSuffix '.dev'
+            versionNameSuffix '-dev'
+            debuggable false
+        }
+        debug {`,
+      )
       .replace('zh-Hant', 'b+zh+Hant')
       .replace('pt-BR', 'b+pt+BR')
       .replace(
         /buildTypes \{([\s\S]*?)release \{([\s\S]*?)signingConfig signingConfigs\.debug/,
-        `buildTypes {$1release { `,
+        `buildTypes {$1release {`,
       )
       .replace(
         /androidResources \{([\s\S]*?)}/,

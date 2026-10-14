@@ -48,7 +48,7 @@ Preserve imported behavior as a reference; replace one subsystem at a time, add 
 - Bun locked dependency restoration completed using ignore-scripts.
 
 **Still pending (not claimed as complete):**
-- Build and install on Android/iOS physical devices, native feature parity and background media verification.
+- Android FOSS Debug first-install and launch succeeded on OnePlus N200 (October 14, 2026), with a visible YouTube home WebView. iOS device testing, playback, native feature parity, background media, PiP, Glaze and privacy verification remain open.
 - Official GoreeCloud Glaze implementation and approved visual assets, accessibility review and first-run onboarding refresh.
 - GoreeCloud Identity/Sync/Privacy Shield/Wardveil interfaces, encrypted data/credential migration and external security review.
 - Approved Development key management, signed APK in GoreeCloud Drive, release channel, licensed-source disclosures and actual deployment.

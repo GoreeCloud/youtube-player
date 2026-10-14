@@ -34,6 +34,19 @@ def verify() -> None:
     require(release is not None, "Release buildType missing")
     require("signingConfig" not in release.group(1),
             "Release must not implicitly inherit ephemeral debug signing")
+    development = re.search(r"\bdevelopment\s*\{(.*?)\n\s*\}", gradle, re.S)
+    require(development is not None, "Independent Development build type missing")
+    dev = development.group(1)
+    require("applicationIdSuffix '.dev'" in dev,
+            "Development must install under a separate .dev package")
+    require("versionNameSuffix '-dev'" in dev and "debuggable false" in dev,
+            "Development is not a debug-enabled or normal release build")
+    require("initWith release" in dev, "Development must bundle its JS and resources")
+    require("signingConfig" not in dev, "Development must NEVER inherit debug signing")
+    import json
+    metadata = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
+    require(isinstance(metadata.get("versionCode"), int) and metadata["versionCode"] >= 2,
+            "Development versionCode must exceed prior QA baseline 1")
 
     android_ns = "{http://schemas.android.com/apk/res/android}"
     tree = ET.parse(MANIFEST)
