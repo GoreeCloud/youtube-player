@@ -64,6 +64,54 @@ def inspect_provenance(provenance, source_sha, unsigned_digest, apk_name, versio
         raise ValueError("CI provenance APK checksum mismatch")
 
 
+def verify_original_ci_artifact(apk, provenance, source_sha):
+    """Require the actual successful, owner-authenticated GitHub Actions artifact.
+
+    A locally copied provenance.txt alone is not CI attestation: it can be forged.
+    Signing stops when the 1-day original artifact has expired or is unavailable.
+    """
+    if command("gh", "api", "user", "--jq", ".login").stdout.strip() != "GoreeCloud":
+        raise ValueError("Wrong active GitHub identity; GoreeCloud required")
+    entries = dict(line.split("=", 1) for line in provenance.read_text().splitlines()
+                   if line.startswith(("run_id=", "source_sha=")))
+    run_id = entries["run_id"]
+    repo = "GoreeCloud/youtube-player"
+    metadata = json.loads(command(
+        "gh", "api", f"repos/{repo}/actions/runs/{run_id}"
+    ).stdout)
+    if (metadata.get("name") != "Android unsigned Development candidate"
+            or metadata.get("head_branch") != "main"
+            or metadata.get("event") != "workflow_dispatch"
+            or metadata.get("head_sha", "").lower() != source_sha.lower()
+            or metadata.get("conclusion") != "success"
+            or metadata.get("status") != "completed"
+            or metadata.get("repository", {}).get("full_name") != repo):
+        raise ValueError("GitHub Actions run is not an approved main-branch candidate")
+    archive_name = f"unsigned-development-{source_sha.lower()}"
+    listing = json.loads(command(
+        "gh", "api", f"repos/{repo}/actions/runs/{run_id}/artifacts?per_page=100"
+    ).stdout)
+    matching = [a for a in listing.get("artifacts", [])
+                if a.get("name") == archive_name and not a.get("expired")]
+    if len(matching) != 1:
+        raise ValueError("Original Development CI artifact expired or ambiguous")
+    with tempfile.TemporaryDirectory(prefix="goreecloud-source-proof-") as folder:
+        original = Path(folder)
+        command("gh", "run", "download", run_id, "--repo", repo,
+                "--name", archive_name, "--dir", str(original))
+        original_apk = original / apk.name
+        original_provenance = original / "provenance.txt"
+        if not original_apk.is_file() or not original_provenance.is_file():
+            raise ValueError("Downloaded GitHub artifact incomplete")
+        if (not original_apk.resolve().is_relative_to(original.resolve())
+                or not original_provenance.resolve().is_relative_to(original.resolve())):
+            raise ValueError("Unsafe GitHub artifact path")
+        if (original_provenance.read_bytes() != provenance.read_bytes()
+                or hashlib.sha256(original_apk.read_bytes()).digest()
+                   != hashlib.sha256(apk.read_bytes()).digest()):
+            raise ValueError("Local candidate differs from the original GitHub artifact")
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input", type=Path, required=True)
@@ -108,6 +156,7 @@ def main(argv=None):
     if args.first_issue and version_code != 204:
         raise ValueError("First Development issue must start at ABI-specific versionCode 204")
 
+    verify_original_ci_artifact(args.input.resolve(), args.provenance.resolve(), args.source_sha)
     output.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix=".goreecloud-sign-", dir=output.parent) as work:
         aligned = Path(work) / "aligned.apk"
