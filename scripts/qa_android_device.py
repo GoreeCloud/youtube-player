@@ -5,6 +5,7 @@ import hashlib
 import json
 from pathlib import Path
 import re
+import shutil
 import subprocess
 import sys
 from datetime import datetime, timezone
@@ -20,6 +21,18 @@ def eligible_apk(path):
     name = path.name.lower()
     return (path.is_file() and name.endswith("-debug.apk") and
             "arm64-v8a" in name and ("foss" in name or "full" in name))
+
+
+def apk_package(apk):
+    # Never rely on the filename alone to identify an installable APK.
+    if shutil.which("aapt"):
+        metadata = run("aapt", "dump", "badging", str(apk))
+        match = re.search(r"^package: name='([^']+)'", metadata, re.MULTILINE)
+        if match:
+            return match.group(1)
+    elif shutil.which("aapt2"):
+        return run("aapt2", "dump", "packagename", str(apk)).strip()
+    raise RuntimeError("aapt or aapt2 is required to inspect the APK package identity")
 
 
 def authorized_device(requested):
@@ -38,6 +51,8 @@ def inspect(apk, serial):
     if not eligible_apk(apk):
         raise RuntimeError("Only existing FOSS/Full arm64-v8a debug APKs are eligible")
     run("apksigner", "verify", "--verbose", str(apk))
+    if apk_package(apk) != PACKAGE:
+        raise RuntimeError("APK package identity mismatch")
     model = run("adb", "-s", serial, "shell", "getprop", "ro.product.model")
     abi = run("adb", "-s", serial, "shell", "getprop", "ro.product.cpu.abilist")
     sdk = int(run("adb", "-s", serial, "shell", "getprop", "ro.build.version.sdk"))
@@ -56,10 +71,15 @@ def main(argv=None):
     parser.add_argument("apk", type=Path)
     parser.add_argument("--serial", help="Explicit authorized ADB serial (not recorded)")
     parser.add_argument("--install", action="store_true", help="Explicitly permit first install + launch")
+    parser.add_argument("--expected-sha256", help="SHA-256 from the verified GitHub build evidence")
     parser.add_argument("--report", type=Path, help="Write sanitized JSON evidence; fails if already exists")
     args = parser.parse_args(argv)
     serial = authorized_device(args.serial)
     details = inspect(args.apk.resolve(), serial)
+    if args.expected_sha256 and details["sha256"] != args.expected_sha256.lower():
+        raise RuntimeError("APK SHA-256 does not match verified build evidence")
+    if args.install and not args.expected_sha256:
+        raise RuntimeError("First installation requires --expected-sha256 from CI evidence")
     details["result"] = "verified_only"
     if args.install:
         run("adb", "-s", serial, "install", str(args.apk.resolve()))
