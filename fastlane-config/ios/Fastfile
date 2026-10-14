@@ -24,6 +24,7 @@ platform :ios do
 
   desc "Build and upload an IPA to App Store Connect"
   lane :upload_ipa do |options|
+    UI.user_error!("GoreeCloud iOS store publishing disabled for development") unless ENV["GOREECLOUD_IOS_STORE_PUBLISH_AUTHORIZED"] == "1"
     api_key = asc_api_key
     app_identifier = options[:app_identifier] || ENV["IOS_APP_IDENTIFIER"] || "com.goreecloud.youtubeplayer"
     ipa_path = options[:ipa] || ENV["IPA_PATH"] || File.expand_path("../../ios/build/NouTube.ipa", __dir__)
@@ -115,6 +116,7 @@ platform :ios do
 
   desc "Upload screenshots to App Store Connect"
   lane :upload_screenshots do
+    UI.user_error!("GoreeCloud iOS store publishing disabled for development") unless ENV["GOREECLOUD_IOS_STORE_PUBLISH_AUTHORIZED"] == "1"
     upload_to_app_store(
       force: true,
       skip_binary_upload: true,

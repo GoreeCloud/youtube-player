@@ -13,6 +13,13 @@ import {
   run,
 } from './release-utils'
 
+// Explicitly opt in before probing credentials, writing metadata or invoking Fastlane.
+// This is a guard against accidental development-side store publication, not
+// proof of release approval or completed Apple/device acceptance gates.
+if (process.env.GOREECLOUD_IOS_STORE_PUBLISH_AUTHORIZED !== '1') {
+  fail('iOS App Store publishing is disabled for GoreeCloud development builds.')
+}
+
 const [ipaArg] = Bun.argv.slice(2)
 const pkg = await packageInfo()
 const ipaPath = ipaArg ?? process.env.IPA_PATH ?? resolve(repoRoot, 'ios/build/NouTube.ipa')
@@ -23,9 +30,9 @@ const releaseNotesPath = process.env.IOS_RELEASE_NOTES_PATH
   ?? resolve(repoRoot, 'fastlane/metadata/ios/en-US/release_notes.txt')
 const skipBinaryUpload = envFlag('IOS_SKIP_BINARY_UPLOAD', false)
 const skipBuild = envFlag('SKIP_BUILD', skipBinaryUpload)
-const submitForReview = envFlag('IOS_SUBMIT_FOR_REVIEW', true)
-const rejectIfPossible = envFlag('IOS_REJECT_IF_POSSIBLE', submitForReview)
-const automaticRelease = envFlag('IOS_AUTOMATIC_RELEASE', true)
+const submitForReview = envFlag('IOS_SUBMIT_FOR_REVIEW', false)
+const rejectIfPossible = envFlag('IOS_REJECT_IF_POSSIBLE', false)
+const automaticRelease = envFlag('IOS_AUTOMATIC_RELEASE', false)
 
 requireEnv('APP_STORE_KEY_ID')
 requireEnv('APP_STORE_ISSUER_ID')
