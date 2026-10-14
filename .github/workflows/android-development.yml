@@ -20,6 +20,12 @@ on:
       - main
       - "feat/youtube-player-android-*"
   workflow_dispatch:
+    inputs:
+      retain_qa_apks:
+        description: "Retain unsigned-for-release, ephemeral debug APKs for a 1-day device QA session"
+        type: boolean
+        required: true
+        default: false
 
 permissions:
   contents: read
@@ -73,8 +79,32 @@ jobs:
           outputs = list(Path('android/app/build/outputs/apk').rglob('*.apk'))
           assert any('foss' in str(p).lower() for p in outputs), outputs
           assert any('full' in str(p).lower() for p in outputs), outputs
-          print(f"Verified {len(outputs)} ephemeral Android debug APKs; no artifact is published.")
+          print(f"Verified {len(outputs)} ephemeral Android debug APKs.")
           PY
+      - name: Verify bounded QA APKs and record checksums
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.retain_qa_apks == true }}
+        run: |
+          mkdir -p qa-evidence
+          printf 'source_sha=%s\nrun_id=%s\nephemeral_debug_only=true\n' \
+            "$GITHUB_SHA" "$GITHUB_RUN_ID" > qa-evidence/build.txt
+          find android/app/build/outputs/apk -type f -name '*.apk' -print0 | sort -z | \
+            xargs -0 sha256sum >> qa-evidence/build.txt
+          while IFS= read -r -d '' apk; do
+            "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose "$apk"
+          done < <(find android/app/build/outputs/apk -type f -name '*.apk' -print0)
+      - name: Retain bounded QA APKs for 1 day
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.retain_qa_apks == true }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: qa-debug-${{ github.sha }}-${{ github.run_attempt }}
+          path: |
+            android/app/build/outputs/apk/foss/debug/*.apk
+            android/app/build/outputs/apk/full/debug/*.apk
+            qa-evidence/build.txt
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 0
 
-# No release publication, APK upload, reusable signing credentials, or deployment.
-# This job uses only ephemeral CI debug signing and does not establish QA or Stable status.
+# Pull requests and pushes NEVER upload APKs. Manual owner-triggered opt-in
+# retains only ephemeral debug QA APKs for 1 day with checksums; no release
+# signing identity, release publication, GoreeCloud Drive delivery or deployment.

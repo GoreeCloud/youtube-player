@@ -68,6 +68,15 @@ sources and the native SDK remain isolated to the CI runner. A source-build
 failure is a tracked development defect, not permission to weaken signing or
 release gates.
 
+For bounded device QA only, a manually triggered workflow may explicitly opt in
+with `retain_qa_apks=true`. This retains FOSS and Full **ephemeral debug-signed**
+APK files for **one day** with a source revision and SHA-256 evidence record.
+Ordinary push and pull-request runs never upload APKs. The artifact is not a
+Development release, does not support reliable updates, and must not be sent as
+an owner-installable APK without the separately approved persistent signing
+identity and GoreeCloud Drive delivery path. Installation must first confirm
+that the target package is absent or that the existing data/update path is safe.
+
 ## Desktop Flatpak metadata identity
 
 The legacy local Flatpak manifest and AppStream/desktop entry names have been
