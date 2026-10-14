@@ -74,6 +74,15 @@ class DeviceQATests(unittest.TestCase):
                 mocked.assert_not_called()
 
 
+    def test_android_pm_exit_one_without_output_means_absent(self):
+        from subprocess import CalledProcessError
+        with patch.object(qa, "run", side_effect=CalledProcessError(1, "pm path", output="", stderr="")):
+            self.assertFalse(qa.already_installed("test"))
+        with patch.object(qa, "run", side_effect=CalledProcessError(1, "pm path", output="", stderr="device offline")):
+            with self.assertRaises(CalledProcessError):
+                qa.already_installed("test")
+
+
 
 if __name__ == "__main__":
     unittest.main()
