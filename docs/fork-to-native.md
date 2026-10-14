@@ -67,3 +67,16 @@ does not constitute acceptance on a physical Android device. Generated Gradle
 sources and the native SDK remain isolated to the CI runner. A source-build
 failure is a tracked development defect, not permission to weaken signing or
 release gates.
+
+## Desktop Flatpak metadata identity
+
+The legacy local Flatpak manifest and AppStream/desktop entry names have been
+replaced with the independent development identity
+\`com.goreecloud.youtubeplayer.Dev\`. Previously inherited NouTube release
+history and screenshot URLs have deliberately been excluded: neither describes
+a verified GoreeCloud build. The wrapper points at the GoreeCloud executable,
+with the original NouTube provenance retained in \`UPSTREAM.md\`.
+
+This is source-metadata validation only; the pinned Flatpak runtime, Electron
+archives, packaging, installation and desktop runtime have not been certified.
+No Flatpak production release or distribution is authorized by this change.

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.goreecloud.youtubeplayer.Dev</id>
+  <name>GoreeCloud YouTube Player (Development)</name>
+  <summary>Development-only YouTube and YouTube Music player</summary>
+  <developer id="com.goreecloud">
+    <name>GoreeCloud</name>
+  </developer>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>AGPL-3.0-or-later</project_license>
+  <description>
+    <p>Experimental GoreeCloud source derived from NouTube. Local playback
+       and library features are under validation. Cloud account and sync
+       services are unavailable; this build is not certified for distribution.</p>
+  </description>
+  <url type="homepage">https://github.com/GoreeCloud/youtube-player</url>
+  <url type="vcs-browser">https://github.com/GoreeCloud/youtube-player</url>
+  <url type="bugtracker">https://github.com/GoreeCloud/youtube-player/issues</url>
+  <launchable type="desktop-id">com.goreecloud.youtubeplayer.Dev.desktop</launchable>
+  <content_rating type="oars-1.1" />
+</component>

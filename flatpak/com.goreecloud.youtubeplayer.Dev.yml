@@ -1,4 +1,4 @@
-app-id: jp.nonbili.noutube-dev
+app-id: com.goreecloud.youtubeplayer.Dev
 runtime: org.freedesktop.Platform
 runtime-version: '25.08'
 sdk: org.freedesktop.Sdk
@@ -19,10 +19,10 @@ finish-args:
   - --filesystem=xdg-download
   - --talk-name=org.freedesktop.FileManager1
 modules:
-  - name: noutube
+  - name: goreecloud-youtube-player
     buildsystem: simple
     build-options:
-      append-path: /usr/lib/sdk/node22/bin:/run/build/noutube/bin
+      append-path: /usr/lib/sdk/node22/bin:/run/build/goreecloud-youtube-player/bin
       env:
         VITE_BUILD_TARGET: portable
     build-commands:
@@ -35,13 +35,11 @@ modules:
 
       - install -Dm755 -t /app/bin/ ./run.sh
 
-      # Prepare dev metadata with correct app-id
+      # Development-only GoreeCloud metadata; no inherited screenshots or release claims
       - |
-        sed 's/jp.nonbili.noutube/jp.nonbili.noutube-dev/g' metadata/flatpak/jp.nonbili.noutube.metainfo.xml > jp.nonbili.noutube-dev.metainfo.xml
-        sed 's/Icon=jp.nonbili.noutube/Icon=jp.nonbili.noutube-dev/g' metadata/flatpak/jp.nonbili.noutube.desktop > jp.nonbili.noutube-dev.desktop
-        install -Dm644 jp.nonbili.noutube-dev.metainfo.xml /app/share/metainfo/jp.nonbili.noutube-dev.metainfo.xml
-        install -Dm644 jp.nonbili.noutube-dev.desktop /app/share/applications/jp.nonbili.noutube-dev.desktop
-        install -Dm644 desktop/icon.png /app/share/icons/hicolor/512x512/apps/jp.nonbili.noutube-dev.png
+        install -Dm644 metadata/flatpak/com.goreecloud.youtubeplayer.Dev.metainfo.xml /app/share/metainfo/com.goreecloud.youtubeplayer.Dev.metainfo.xml
+        install -Dm644 metadata/flatpak/com.goreecloud.youtubeplayer.Dev.desktop /app/share/applications/com.goreecloud.youtubeplayer.Dev.desktop
+        install -Dm644 desktop/icon.png /app/share/icons/hicolor/512x512/apps/com.goreecloud.youtubeplayer.Dev.png
 
     sources:
       - type: dir
@@ -76,4 +74,4 @@ modules:
       - type: script
         dest-filename: run.sh
         commands:
-          - zypak-wrapper.sh /app/main/noutube "$@"
+          - zypak-wrapper.sh /app/main/goreecloud-youtube-player "$@"

@@ -1,36 +1,28 @@
-# Local Flatpak Testing
+# Development-only Flatpak manifest
 
-This directory contains a manifest adapted for local testing of the Flatpak build.
+The manifest \`com.goreecloud.youtubeplayer.Dev.yml\` is for isolated local
+experiments, not distribution. GoreeCloud does not claim that this Flatpak has
+been built, installed, reviewed or signed.
+
+The independently branded AppStream and desktop files identify
+\`com.goreecloud.youtubeplayer.Dev\`. The desktop bundle command uses
+\`goreecloud-youtube-player\`, not the inherited NouTube executable.
 
 ## Prerequisites
 
-1.  **Flatpak & flatpak-builder**: Ensure you have them installed on your system.
-2.  **Runtimes**: Install the necessary runtimes and SDKs:
-    ```bash
-    flatpak install flathub org.freedesktop.Platform//25.08 org.freedesktop.Sdk//25.08 org.electronjs.Electron2.BaseApp//25.08
-    ```
-3.  **Local Dependencies**: Since this manifest uses `type: dir` for the source, it will include your local `node_modules`. Make sure you have run `bun install` in the project root.
+The manifest currently targets Flatpak Freedesktop SDK 25.08,
+\`org.electronjs.Electron2.BaseApp\`, and pinned upstream Electron/Bun archives.
+Its dependency versions and checksums must be refreshed and verified before
+first build. Local dependencies must already be installed in the source tree.
 
-## Building
+## Example development-only commands
 
-To build the Flatpak locally:
+\`\`\`sh
+flatpak-builder --force-clean build-dir flatpak/com.goreecloud.youtubeplayer.Dev.yml
+flatpak-builder --run build-dir flatpak/com.goreecloud.youtubeplayer.Dev.yml run.sh
+\`\`\`
 
-```bash
-flatpak-builder --user --install --force-clean build-dir flatpak/jp.nonbili.noutube.yml
-```
-
-## Running
-
-Once installed, you can run it via:
-
-```bash
-flatpak run jp.nonbili.noutube-dev
-```
-
-## Manifest Changes for Local Testing
-
-- App ID changed to `jp.nonbili.noutube-dev` to avoid conflicts with stable installation.
-- Changed source `type` to `dir` pointing to the project root.
-- Added `--filesystem=xdg-download` to `finish-args` to allow the app to save videos to the standard Downloads folder.
-- Added `--talk-name=org.freedesktop.FileManager1` to `finish-args` to enable Electron's "show item in folder" functionality on the host.
-- Removed external `source.tar.gz` and `node_modules` archives to use local files instead.
+Do not upload, publish or represent development output as Stable. Real
+compatibility, runtime, accessibility, media and privacy checks remain open in
+GitHub Issue #2. Upstream author attribution and the source license remain in
+\`UPSTREAM.md\` and \`LICENSE\`.

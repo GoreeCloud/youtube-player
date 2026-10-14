@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=GoreeCloud YouTube Player (Development)
+Comment=Development-only YouTube and YouTube Music player
+Exec=/app/bin/run.sh %u
+Type=Application
+Categories=AudioVideo;Player;
+Icon=com.goreecloud.youtubeplayer.Dev
+MimeType=x-scheme-handler/goreecloud-youtube-player;
