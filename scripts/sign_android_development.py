@@ -42,6 +42,28 @@ def inspect_unsigned(apk, expected_digest):
     return digest, version_code
 
 
+def inspect_provenance(provenance, source_sha, unsigned_digest, apk_name, version_code):
+    """Bind local signing to the exact CI build provenance and APK checksum."""
+    entries = {}
+    checksums = []
+    for line in provenance.read_text(encoding="utf-8").splitlines():
+        if line.startswith(("source_sha=", "run_id=", "signing=", "application_id=", "version_code=")):
+            key, value = line.split("=", 1)
+            if key in entries:
+                raise ValueError("Duplicate CI provenance key: " + key)
+            entries[key] = value
+        else:
+            checksums.append(line)
+    if (entries.get("source_sha", "").lower() != source_sha.lower()
+            or not entries.get("run_id", "").isdigit()
+            or entries.get("signing") != "NONE"
+            or entries.get("application_id") != PKG
+            or entries.get("version_code") != str(version_code)):
+        raise ValueError("CI provenance source, channel, build or package mismatch")
+    if f"{unsigned_digest.lower()}  {apk_name}" not in checksums:
+        raise ValueError("CI provenance APK checksum mismatch")
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input", type=Path, required=True)
@@ -49,6 +71,7 @@ def main(argv=None):
     parser.add_argument("--keystore", type=Path, required=True)
     parser.add_argument("--source-sha", required=True)
     parser.add_argument("--unsigned-sha256", required=True)
+    parser.add_argument("--provenance", type=Path, required=True)
     parser.add_argument("--expected-cert-sha256", required=True)
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--first-issue", action="store_true")
@@ -71,12 +94,15 @@ def main(argv=None):
         if not os.getenv(name):
             raise ValueError(f"Protected signing environment variable missing: {name}")
     output = args.output.expanduser().absolute()
-    if output.exists() or output == args.input.resolve():
-        raise ValueError("Output already exists; never overwrite signed APKs")
+    receipt_path = output.with_suffix(output.suffix + ".receipt.json")
+    if output.exists() or receipt_path.exists() or output == args.input.resolve():
+        raise ValueError("Output or receipt already exists; never overwrite")
     for executable in ("aapt", "zipalign", "apksigner"):
         if not shutil.which(executable):
             raise RuntimeError(f"Missing local Android build tool: {executable}")
     digest, version_code = inspect_unsigned(args.input.resolve(), args.unsigned_sha256)
+    inspect_provenance(args.provenance.resolve(strict=True), args.source_sha,
+                       digest, args.input.name, version_code)
     if args.previous_version_code is not None and version_code <= args.previous_version_code:
         raise ValueError("Android versionCode must increase for signed Development updates")
     if args.first_issue and version_code != 204:
@@ -103,8 +129,8 @@ def main(argv=None):
         metadata = command("aapt", "dump", "badging", str(staged)).stdout
         if not re.search(r"^package: name='" + re.escape(PKG) + r"' versionCode='" + str(version_code) + r"'", metadata, re.M):
             raise ValueError("Signed APK package/version changed")
+        os.chmod(staged, 0o600)
         staged.replace(output)
-    os.chmod(output, 0o600)
     receipt = {
         "channel": "Development (not released)",
         "package": PKG,
@@ -116,7 +142,6 @@ def main(argv=None):
         "first_issue": bool(args.first_issue),
         "status": "locally_signed_not_distributed",
     }
-    receipt_path = output.with_suffix(output.suffix + ".receipt.json")
     with receipt_path.open("x", encoding="utf-8") as stream:
         json.dump(receipt, stream, indent=2)
     os.chmod(receipt_path, 0o600)
