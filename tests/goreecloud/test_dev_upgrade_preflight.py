@@ -94,6 +94,11 @@ class DevelopmentUpgradeTests(unittest.TestCase):
                         qa.verify_upgrade(p, receipt)
                 cmd.assert_not_called()
 
+    def test_untrusted_device_refused(self):
+        with patch.object(qa, "command", return_value="List of devices attached\\nauthorized device"):
+            with self.assertRaisesRegex(RuntimeError, "unavailable"):
+                qa.authorized_serial("unauthorized")
+
 
 if __name__ == "__main__":
     unittest.main()
