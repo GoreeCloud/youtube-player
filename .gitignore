@@ -51,3 +51,11 @@ fastlane/metadata/ios/en-US/release_notes.txt
 __pycache__/
 *.pyc
 .goreecloud-local/
+
+# Protected owner signing keys and recovery evidence must never enter Git.
+*.p12
+*.pfx
+*.jks
+*.p12.gpg
+*.custody.json
+.goreecloud-private-signing/
