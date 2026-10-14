@@ -53,3 +53,17 @@ Preserve imported behavior as a reference; replace one subsystem at a time, add 
 - GoreeCloud Identity/Sync/Privacy Shield/Wardveil interfaces, encrypted data/credential migration and external security review.
 - Approved Development key management, signed APK in GoreeCloud Drive, release channel, licensed-source disclosures and actual deployment.
 - Desktop native package builds and browser extension signing/distribution.
+
+## Android CI source-build gate (development)
+
+The independent Android development workflow generates the Android project
+afresh with Expo Continuous Native Generation, verifies the GoreeCloud app ID,
+two product flavors, deep-link scheme and PiP manifest, and attempts both
+assembleFossDebug and assembleFullDebug.
+
+The job is intentionally non-distributing: it creates no public APK artifact,
+uses no stored signing keys, never uploads a binary to GoreeCloud Drive, and
+does not constitute acceptance on a physical Android device. Generated Gradle
+sources and the native SDK remain isolated to the CI runner. A source-build
+failure is a tracked development defect, not permission to weaken signing or
+release gates.

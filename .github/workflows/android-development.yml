@@ -1,0 +1,78 @@
+name: Android development validation
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/android-development.yml"
+      - "android/**"
+      - "app.config.ts"
+      - "assets/**"
+      - "content/**"
+      - "modules/**"
+      - "plugins/**"
+      - "lib/**"
+      - "components/**"
+      - "package.json"
+      - "bun.lock"
+      - "scripts/verify-android-prebuild.py"
+  push:
+    branches:
+      - main
+      - "feat/youtube-player-android-*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  android-compile:
+    name: Android FOSS/Full source compile (no distribution)
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    env:
+      CI: "1"
+      EXPO_NO_TELEMETRY: "1"
+      EXPO_NO_GIT_STATUS: "1"
+      GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+    steps:
+      - name: Checkout exact source revision
+        uses: actions/checkout@v4
+      - name: Set up Java for Android Gradle Plugin
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Install Android SDK command line tools
+        uses: android-actions/setup-android@v3
+      - name: Install Android API 36 SDK
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+      - name: Set up locked Bun runtime
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.3"
+      - name: Restore source dependencies without install scripts
+        run: bun install --frozen-lockfile --ignore-scripts
+      - name: Bundle inherited WebView content script
+        run: bun run bundle:es
+      - name: Generate Android source cleanly
+        run: bunx expo prebuild --platform android --clean --no-install
+      - name: Verify Android product identity and variant isolation
+        run: python3 -B scripts/verify-android-prebuild.py
+      - name: Make Gradle executable
+        run: chmod +x android/gradlew
+      - name: Compile both Android development flavors
+        working-directory: android
+        run: |
+          ./gradlew :app:assembleFossDebug :app:assembleFullDebug --no-daemon --stacktrace --max-workers=2
+      - name: Verify device ABI output files
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          outputs = list(Path('android/app/build/outputs/apk').rglob('*.apk'))
+          assert any('foss' in str(p).lower() for p in outputs), outputs
+          assert any('full' in str(p).lower() for p in outputs), outputs
+          print(f"Verified {len(outputs)} ephemeral Android debug APKs; no artifact is published.")
+          PY
+
+# No release publication, APK upload, reusable signing credentials, or deployment.
+# This job uses only ephemeral CI debug signing and does not establish QA or Stable status.
