@@ -3,8 +3,7 @@ import { isSupportedUrl } from '@/lib/supported-url'
 import '../../types'
 
 export function handleDeeplink(link: string): void {
-  const url = new URL(link)
-  if (url.protocol != 'noutube:' && !isSupportedUrl(link)) {
+  if (!isSupportedUrl(link)) {
     return
   }
   // console.log('on deeplink', link)
