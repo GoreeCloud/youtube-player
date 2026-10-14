@@ -38,6 +38,8 @@ class DevelopmentSigningGate(unittest.TestCase):
         self.assertNotIn("apksigner sign", workflow)
         standard = (ROOT / ".github/workflows/android-development.yml").read_text()
         self.assertIn("assembleFossDevelopment", standard)
+        # Cold native release-like builds exceeded the former 55-minute CI limit.
+        self.assertIn("timeout-minutes: 120", standard)
         self.assertIn("Development APK unexpectedly signed", standard)
         self.assertIn("name '*debug.apk'", standard)
 

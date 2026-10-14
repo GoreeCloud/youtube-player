@@ -34,7 +34,9 @@ jobs:
   android-compile:
     name: Android FOSS/Full source compile (no distribution)
     runs-on: ubuntu-latest
-    timeout-minutes: 55
+    # Three native variants (including release-like Development) exceed 55 minutes
+    # on a cold runner; preserve all security checks instead of skipping tasks.
+    timeout-minutes: 120
     env:
       CI: "1"
       EXPO_NO_TELEMETRY: "1"
