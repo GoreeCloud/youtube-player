@@ -95,9 +95,43 @@ class DevelopmentUpgradeTests(unittest.TestCase):
                 cmd.assert_not_called()
 
     def test_untrusted_device_refused(self):
-        with patch.object(qa, "command", return_value="List of devices attached\\nauthorized device"):
+        with patch.object(qa, "command", return_value="List of devices attached\nauthorized device"):
             with self.assertRaisesRegex(RuntimeError, "unavailable"):
                 qa.authorized_serial("unauthorized")
+
+    def test_wrong_installed_apk_package_is_rejected(self):
+        with tempfile.TemporaryDirectory() as folder:
+            installed = Path(folder) / "installed.apk"
+            installed.write_bytes(b"APK")
+            wrong = "package: name='com.example.other' versionCode='204' versionName='0.1.0-dev'"
+            with patch.object(qa, "command", return_value=wrong):
+                with self.assertRaisesRegex(ValueError, "Expected GoreeCloud"):
+                    qa.apk_identity(installed)
+
+    def test_ambiguous_installed_base_apks_are_rejected(self):
+        with tempfile.TemporaryDirectory() as folder:
+            candidate = Path(folder) / "candidate.apk"
+            candidate.write_bytes(b"APK")
+            receipt = Path(folder) / "receipt.json"
+            receipt.write_text(json.dumps({
+                "package": qa.PACKAGE,
+                "signed_sha256": hashlib.sha256(b"APK").hexdigest(),
+                "certificate_sha256": CERT, "version_code": 205,
+                "source_sha": "a" * 40, "status": "locally_signed_not_distributed",
+            }))
+            def response(*args, **kwargs):
+                if args[:2] == ("adb", "devices"):
+                    return "List of devices attached\nmockdevice device"
+                if "ro.product.cpu.abilist" in args:
+                    return "arm64-v8a"
+                if "pm" in args:
+                    return "package:/data/app/one/base.apk\npackage:/data/app/two/base.apk"
+                return ""
+            with patch.object(qa, "command", side_effect=response), patch.object(
+                qa, "apk_identity", return_value=(205, CERT)
+            ):
+                with self.assertRaisesRegex(RuntimeError, "ambiguous"):
+                    qa.verify_upgrade(candidate, receipt)
 
 
 if __name__ == "__main__":
