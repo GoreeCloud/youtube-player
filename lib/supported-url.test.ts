@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test'
-import { getSupportedVideoId, isSupportedUrl, normalizeSupportedUrl } from './supported-url'
+import { findSupportedLaunchUrl, getSupportedVideoId, isSafeExternalUrl, isSupportedUrl, normalizeSupportedUrl } from './supported-url'
 
 describe('YouTube deep link safety', () => {
   it('accepts HTTPS and converts validated legacy and GoreeCloud custom links', () => {
@@ -59,6 +59,46 @@ describe('getSupportedVideoId', () => {
       '',
     ]) {
       expect(getSupportedVideoId(url)).toBe('')
+    }
+  })
+})
+
+describe('desktop OS URL ingress', () => {
+  it('selects only supported YouTube URLs from launch arguments', () => {
+    expect(findSupportedLaunchUrl([
+      '--profile=Default',
+      'noutube:auth?code=secret',
+      'file:///tmp/user.json',
+      'https://evil.example/watch?v=abc',
+    ])).toBeUndefined()
+    expect(findSupportedLaunchUrl([
+      'noutube:auth?code=secret',
+      'https://youtube.com.evil.example/watch?v=abc',
+      'goreecloud-youtube-player://www.youtube.com/watch?v=valid',
+      'https://www.youtube.com/watch?v=later',
+    ])).toBe('goreecloud-youtube-player://www.youtube.com/watch?v=valid')
+  })
+
+  it('allows ordinary external web URLs, not credential-bearing or local schemes', () => {
+    for (const link of [
+      'https://example.com/guide',
+      'http://example.org:8080/article',
+    ]) {
+      expect(isSafeExternalUrl(link)).toBe(true)
+    }
+    for (const link of [
+      '',
+      'file:///etc/passwd',
+      'javascript:alert(1)',
+      'data:text/html,hello',
+      'intent://scan/#Intent',
+      'mailto:test@example.com',
+      'goreecloud-youtube-player://www.youtube.com/watch?v=abc',
+      'https://user:pass@example.com',
+      'https://example.com/hel\nlo',
+      'not a URL',
+    ]) {
+      expect(isSafeExternalUrl(link)).toBe(false)
     }
   })
 })
