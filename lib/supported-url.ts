@@ -43,6 +43,23 @@ export function getSupportedVideoId(value: string): string {
   return /^[A-Za-z0-9_-]{1,64}$/.test(id) ? id : ''
 }
 
+/** Read untrusted OS launch arguments using the same trusted-host predicate. */
+export function findSupportedLaunchUrl(args: readonly string[]): string | undefined {
+  return args.find(isSupportedUrl)
+}
+
+/** External OS navigation is limited to ordinary credential-free web URLs. */
+export function isSafeExternalUrl(value: string): boolean {
+  if (!value || /[\u0000-\u001f\u007f]/.test(value)) return false
+  try {
+    const url = new URL(value)
+    return (url.protocol === 'https:' || url.protocol === 'http:') &&
+      Boolean(url.hostname) && !url.username && !url.password
+  } catch {
+    return false
+  }
+}
+
 /* youtu.be only redirects to the watch page. Nothing that decides where a link
  * belongs recognises it as a video until it has been spelled out. */
 export function expandShortUrl(value: string) {
