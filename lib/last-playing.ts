@@ -48,7 +48,8 @@ export function getLastPlaying() {
   }
   const current = Number(last.current)
   const duration = Number(last.duration) || 0
-  if (!Number.isFinite(current) || current < MIN_RESUME_SECONDS) {
+  // Even finite persisted values can be too large to encode as a valid seek.
+  if (!Number.isSafeInteger(Math.floor(current)) || current < MIN_RESUME_SECONDS) {
     return undefined
   }
   if (duration > 0 && current > duration - END_MARGIN_SECONDS) {
