@@ -1,7 +1,7 @@
 import { ui$, updateUrl } from '@/states/ui'
 import { settings$ } from '@/states/settings'
 import { debounce } from 'es-toolkit'
-import { expandShortUrl, isSupportedUrl, normalizeSupportedUrl } from './supported-url'
+import { expandShortUrl, getSupportedVideoId, isSupportedUrl, normalizeSupportedUrl } from './supported-url'
 import { removeTrackingParams } from './tracking-url'
 
 export { getPageType } from './page-type'
@@ -18,13 +18,9 @@ export function getVideoThumbnail(id: string) {
   return `https://img.youtube.com/vi/${id}/hqdefault.jpg`
 }
 
-/* https://www.youtube.com/watch?v=<id> */
+/** Used by the playing queue and thumbnail preview; never trust a bare v= query. */
 export function getVideoId(url: string) {
-  try {
-    return new URL(url).searchParams.get('v')
-  } catch {
-    return ''
-  }
+  return getSupportedVideoId(url)
 }
 
 export function getThumbnail(url: string) {
