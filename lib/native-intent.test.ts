@@ -40,7 +40,15 @@ describe('expandShortUrl', () => {
   })
 
   it('leaves everything else alone', () => {
-    for (const url of ['https://youtu.be/', 'https://m.youtube.com/watch?v=abc123', 'noutube:auth?code=example', 'x']) {
+    for (const url of [
+      'https://youtu.be/',
+      'http://youtu.be/abc123',
+      'https://youtu.be/abc123/extra',
+      'https://youtu.be/abc%2Fdef',
+      'https://m.youtube.com/watch?v=abc123',
+      'noutube:auth?code=example',
+      'x',
+    ]) {
       expect(expandShortUrl(url)).toBe(url)
     }
   })
