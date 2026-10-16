@@ -1,4 +1,5 @@
 import { history$ } from '@/states/history'
+import { normalizeSupportedUrl } from '@/lib/supported-url'
 
 // Anything shorter is not worth resuming, and a video watched to (nearly) the
 // end should start over instead.
@@ -8,17 +9,20 @@ const END_MARGIN_SECONDS = 10
 // lib/page's getVideoId would drag states/ui, and with it a states/tabs import
 // cycle, into this module.
 export function getVideoIdFromUrl(url: string) {
-  try {
-    return new URL(url).searchParams.get('v') || ''
-  } catch {
-    return ''
-  }
+  const safeUrl = normalizeSupportedUrl(url)
+  if (!safeUrl) return ''
+  const parsed = new URL(safeUrl)
+  // The same query parameter on a different page is not proof of a playing video.
+  return parsed.pathname === '/watch' ? parsed.searchParams.get('v') || '' : ''
 }
 
 export function withResumeTime(url: string, current: number) {
+  const seconds = Math.floor(current)
+  // Corrupted playback ticks must not create t=NaNs, t=Infinitys or negative seeks.
+  if (!Number.isSafeInteger(seconds) || seconds < 0) return url
   try {
     const next = new URL(url)
-    next.searchParams.set('t', `${Math.floor(current)}s`)
+    next.searchParams.set('t', `${seconds}s`)
     return next.href
   } catch {
     return url
@@ -38,16 +42,17 @@ export function withoutResumeTime(url: string) {
 /** The last played video with its position baked into the url, when resuming it makes sense. */
 export function getLastPlaying() {
   const last = history$.bookmarks[0].get()
-  if (!last?.videoId || !last.url) {
+  const safeUrl = normalizeSupportedUrl(last?.url || '')
+  if (!last?.videoId || !safeUrl || getVideoIdFromUrl(safeUrl) !== last.videoId) {
     return undefined
   }
-  const current = Number(last.current) || 0
+  const current = Number(last.current)
   const duration = Number(last.duration) || 0
-  if (current < MIN_RESUME_SECONDS) {
+  if (!Number.isFinite(current) || current < MIN_RESUME_SECONDS) {
     return undefined
   }
   if (duration > 0 && current > duration - END_MARGIN_SECONDS) {
     return undefined
   }
-  return { videoId: last.videoId, url: withResumeTime(last.url, current), current }
+  return { videoId: last.videoId, url: withResumeTime(safeUrl, current), current }
 }

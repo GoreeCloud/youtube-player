@@ -44,6 +44,29 @@ describe('getLastPlaying', () => {
     setLastPlaying({ current: 595, duration: 600 })
     expect(getLastPlaying()).toBeUndefined()
   })
+
+  it('ignores corrupted non-finite playback positions', () => {
+    for (const current of [NaN, Infinity, -Infinity]) {
+      setLastPlaying({ current, duration: 0 })
+      expect(getLastPlaying()).toBeUndefined()
+    }
+  })
+
+  it('does not resume a saved link from another origin or an unrelated page', () => {
+    for (const url of [
+      'https://example.com/watch?v=abc123',
+      'https://www.youtube.com/results?search_query=test&v=abc123',
+      'https://www.youtube.com/watch?v=different',
+    ]) {
+      setLastPlaying({ current: 100, duration: 600, url })
+      expect(getLastPlaying()).toBeUndefined()
+    }
+  })
+
+  it('normalizes a supported legacy link before resuming', () => {
+    setLastPlaying({ current: 30, duration: 600, url: 'noutube://www.youtube.com/watch?v=abc123' })
+    expect(getLastPlaying()?.url).toBe('https://www.youtube.com/watch?v=abc123&t=30s')
+  })
 })
 
 describe('withResumeTime', () => {
@@ -56,6 +79,13 @@ describe('withResumeTime', () => {
   it('returns invalid urls untouched', () => {
     expect(withResumeTime('not a url', 30)).toBe('not a url')
   })
+
+  it('never embeds corrupt or negative seek positions', () => {
+    const url = 'https://www.youtube.com/watch?v=abc123'
+    for (const current of [NaN, Infinity, -Infinity, -1, Number.MAX_VALUE]) {
+      expect(withResumeTime(url, current)).toBe(url)
+    }
+  })
 })
 
 describe('getVideoIdFromUrl', () => {
@@ -66,6 +96,9 @@ describe('getVideoIdFromUrl', () => {
   it('returns empty for non video urls', () => {
     expect(getVideoIdFromUrl('https://www.youtube.com/')).toBe('')
     expect(getVideoIdFromUrl('nope')).toBe('')
+    expect(getVideoIdFromUrl('https://example.com/watch?v=abc123')).toBe('')
+    expect(getVideoIdFromUrl('https://www.youtube.com/results?v=abc123')).toBe('')
+    expect(getVideoIdFromUrl('http://www.youtube.com/watch?v=abc123')).toBe('')
   })
 })
 
