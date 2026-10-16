@@ -10,7 +10,7 @@ import { checkForUpdateOnStart } from './lib/auto-update'
 import { initMainChannel } from './ipc/main'
 import contextMenu from 'electron-context-menu'
 import { getUserAgent } from '@/lib/useragent'
-import { isSupportedUrl, normalizeSupportedUrl } from '@/lib/supported-url'
+import { isSafeExternalUrl, isSupportedUrl, normalizeSupportedUrl } from '@/lib/supported-url'
 import { uiClient } from './ipc/ui'
 
 app.userAgentFallback = getUserAgent(process.platform)
@@ -20,7 +20,7 @@ function resolveTargetUrl(rawUrl: string): string {
   try {
     const { pathname, searchParams } = new URL(rawUrl)
     const redirectTo = searchParams.get('q')
-    return pathname === '/redirect' && redirectTo ? redirectTo : rawUrl
+    return isSupportedUrl(rawUrl) && pathname === '/redirect' && redirectTo ? redirectTo : rawUrl
   } catch {
     return rawUrl
   }
@@ -54,8 +54,8 @@ function createWindow(): void {
     }
     if (isSupportedUrl(details.url)) {
       void uiClient.openInAppTab(normalizeSupportedUrl(details.url))
-    } else {
-      shell.openExternal(details.url)
+    } else if (isSafeExternalUrl(details.url)) {
+      void shell.openExternal(details.url).catch(() => console.warn('External web link could not be opened'))
     }
     return { action: 'deny' }
   })
@@ -143,8 +143,8 @@ function createWindow(): void {
       const url = resolveTargetUrl(details.url)
       if (isSupportedUrl(url)) {
         void uiClient.openInAppTab(normalizeSupportedUrl(url))
-      } else {
-        shell.openExternal(url)
+      } else if (isSafeExternalUrl(url)) {
+        void shell.openExternal(url).catch(() => console.warn('External web link could not be opened'))
       }
       return { action: 'deny' }
     })
