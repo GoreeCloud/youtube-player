@@ -4,6 +4,8 @@ const APP_LINK_SCHEME = /^(?:noutube|goreecloud-youtube-player):\/\//i
 // Translate only a scheme at the start. Arbitrary or malformed custom links
 // must never bypass the same YouTube-origin validation as normal HTTPS links.
 function parseSupportedUrl(value: string): URL | null {
+  // URL() silently strips some ASCII control characters; reject them first.
+  if (!value || /[\u0000-\u001f\u007f]/.test(value)) return null
   try {
     const url = new URL(value.replace(APP_LINK_SCHEME, 'https://'))
     if (url.protocol !== 'https:' || !SUPPORTED_HOSTS.has(url.hostname) ||
@@ -38,7 +40,7 @@ export function getSupportedVideoId(value: string): string {
   } else if (segments.length === 2 && ['shorts', 'live', 'embed'].includes(segments[0])) {
     id = segments[1]
   }
-  return /^[A-Za-z0-9_-]+$/.test(id) ? id : ''
+  return /^[A-Za-z0-9_-]{1,64}$/.test(id) ? id : ''
 }
 
 /* youtu.be only redirects to the watch page. Nothing that decides where a link
