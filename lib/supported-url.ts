@@ -46,7 +46,7 @@ export function getSupportedVideoId(value: string): string {
 export function expandShortUrl(value: string) {
   try {
     const url = new URL(value)
-    const id = url.host === 'youtu.be' ? url.pathname.split('/').filter(Boolean)[0] : ''
+    const id = url.host === 'youtu.be' ? getSupportedVideoId(value) : ''
     if (!id) {
       return value
     }
