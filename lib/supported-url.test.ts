@@ -14,6 +14,8 @@ describe('YouTube deep link safety', () => {
       'https://www.youtube.com.attacker.example/watch?v=abc',
       'https://attacker.example@www.youtube.com/watch?v=abc',
       'https://www.youtube.com:4040/watch?v=abc',
+      'https://www.youtube.com/wa\ntch?v=abc',
+      'https://www.youtube.com/watch?v=abc\t123',
       'noutube://attacker.example/watch?v=abc',
       'noutube:auth',
       'goreecloud-youtube-player://attacker.example/watch?v=abc',
@@ -52,6 +54,7 @@ describe('getSupportedVideoId', () => {
       'https://www.youtube.com/shorts/abc123/extra',
       'https://youtu.be/abc123/extra',
       'https://www.youtube.com/watch?v=abc%2Fdef',
+      `https://www.youtube.com/watch?v=${'x'.repeat(65)}`,
       'javascript:alert(1)',
       '',
     ]) {
