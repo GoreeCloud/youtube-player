@@ -45,8 +45,8 @@ describe('getLastPlaying', () => {
     expect(getLastPlaying()).toBeUndefined()
   })
 
-  it('ignores corrupted non-finite playback positions', () => {
-    for (const current of [NaN, Infinity, -Infinity]) {
+  it('ignores corrupt or unrepresentable playback positions', () => {
+    for (const current of [NaN, Infinity, -Infinity, Number.MAX_VALUE]) {
       setLastPlaying({ current, duration: 0 })
       expect(getLastPlaying()).toBeUndefined()
     }
