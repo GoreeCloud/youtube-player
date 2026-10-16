@@ -40,6 +40,7 @@ Preserve imported behavior as a reference; replace one subsystem at a time, add 
 - Desktop automatic updates are disabled pending an independently verified signed GoreeCloud release channel; inherited publisher configuration, donation prompts and update links are removed or replaced.
 - Root/desktop/extension workspace identities and dependency lockfile have been aligned; inherited root package-link build errors removed.
 - Missing nativewind type declarations and legacy desktop package imports were corrected.
+- Playback recovery now accepts only supported YouTube watch links that match the saved video ID, normalizes legacy links to HTTPS, and rejects invalid resume positions. These source guards do not substitute for on-device playback, background audio or PiP acceptance.
 
 **Local verification on October 12, 2026:**
 - Nine Python source/identity isolation tests passed.
