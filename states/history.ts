@@ -6,6 +6,7 @@ import { getIndexedDBPlugin } from './indexeddb'
 // page-type rather than lib/page: the latter pulls in states/ui and with it a
 // states/tabs import cycle.
 import { getPageType } from '@/lib/page-type'
+import { getSupportedVideoId } from '@/lib/supported-url'
 
 const LIMIT = 1000
 
@@ -54,7 +55,19 @@ export const history$ = observable<Store>({
       Object.entries(partial).filter(([, value]) => value !== undefined),
     ) as Partial<History>
     const bookmarks = history$.bookmarks.get()
-    if (!history.videoId || !history.url) {
+    // Page playback events are untrusted. Persist only a video whose claimed
+    // ID matches the trusted YouTube URL; otherwise an unrelated URL could
+    // enter the history/resume surface. Existing saved entries are untouched.
+    if (typeof history.videoId !== 'string' || typeof history.url !== 'string' ||
+        !history.videoId || getSupportedVideoId(history.url) !== history.videoId) {
+      return
+    }
+    // Some page events contain missing or non-finite progress; never poison
+    // history persistence with NaN/Infinity or negative playback times.
+    if ((history.current !== undefined &&
+         (!Number.isFinite(history.current) || history.current < 0)) ||
+        (history.duration !== undefined &&
+         (!Number.isFinite(history.duration) || history.duration < 0))) {
       return
     }
 
