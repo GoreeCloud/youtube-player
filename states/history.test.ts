@@ -58,6 +58,59 @@ describe('addHistory', () => {
   })
 })
 
+describe('untrusted playback history', () => {
+  beforeEach(() => {
+    history$.bookmarks.set([])
+  })
+
+  it('accepts a trusted watch or Shorts URL whose video ID matches', () => {
+    add('safe1')
+    add('short1', { url: 'https://m.youtube.com/shorts/short1' })
+    expect(history$.bookmarks.get().map((item) => item.videoId)).toEqual(['short1', 'safe1'])
+  })
+
+  it('rejects forged origins, unrelated pages, mismatched IDs and malformed routes', () => {
+    const urls = [
+      'https://example.com/watch?v=a',
+      'https://youtube.com.evil.example/watch?v=a',
+      'http://www.youtube.com/watch?v=a',
+      'https://user@www.youtube.com/watch?v=a',
+      'https://www.youtube.com/results?search_query=a&v=a',
+      'https://www.youtube.com/watch?v=b',
+      'https://www.youtube.com/shorts/a/extra',
+      'https://www.youtube.com/wa\ntch?v=a',
+    ]
+    for (const url of urls) {
+      add('a', { url })
+      expect(history$.bookmarks.get().length).toBe(0)
+    }
+  })
+
+  it('does not overwrite a valid saved entry with invalid later playback events', () => {
+    add('a', { current: 30 })
+    const saved = history$.bookmarks[0].get()
+    add('a', { url: 'https://attacker.example/watch?v=a', current: 99 })
+    add('a', { url: 'https://www.youtube.com/watch?v=b', current: 88 })
+    expect(history$.bookmarks.get()).toEqual([saved])
+  })
+
+  it('rejects nonfinite or negative progress before it reaches persistence', () => {
+    for (const fields of [
+      { current: Number.NaN },
+      { current: Number.POSITIVE_INFINITY },
+      { current: -1 },
+      { duration: Number.NaN },
+      { duration: Number.NEGATIVE_INFINITY },
+      { duration: -1 },
+    ]) {
+      add('a', fields)
+      expect(history$.bookmarks.get()).toEqual([])
+    }
+    add('a', { current: 0, duration: 0 })
+    expect(history$.bookmarks.get()).toHaveLength(1)
+  })
+})
+
 describe('addHistory across homes', () => {
   beforeEach(() => {
     history$.bookmarks.set([])
