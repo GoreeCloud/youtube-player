@@ -12,6 +12,8 @@ on:
       - "plugins/**"
       - "lib/**"
       - "components/**"
+      - "app/**"
+      - "states/**"
       - "package.json"
       - "bun.lock"
       - "scripts/verify-android-prebuild.py"
